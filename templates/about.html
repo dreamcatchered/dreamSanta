@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас - Маркет Желаний</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://api.dreampartners.online/icons/santa/android-chrome-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://api.dreampartners.online/icons/santa/android-chrome-512.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #FFF0F0; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .font-hand { font-family: 'Kalam', cursive; }
+        .neo-card {
+            background: white;
+            border: 3px solid #1A1A1A;
+            box-shadow: 4px 4px 0px 0px #1A1A1A;
+        }
+        .love-bg {
+            background-image: radial-gradient(#ffdddd 2px, transparent 0);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-3xl mx-auto love-bg min-h-screen">
+    <a href="/" class="inline-block mb-8 font-bold uppercase text-xs border-b-2 border-black hover:text-red-600">← На главную</a>
+    
+    <header class="text-center mb-16 relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-10 opacity-20 pointer-events-none">
+            <i data-lucide="heart" class="w-64 h-64 text-red-500 fill-current animate-pulse"></i>
+        </div>
+        <h1 class="text-5xl md:text-7xl font-black uppercase font-display mb-6 text-red-600 drop-shadow-[2px_2px_0px_black] relative z-10">Мы верим в чудеса</h1>
+        <p class="text-2xl font-bold text-black font-hand rotate-[-2deg] bg-white inline-block px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_#D42426]">"Любовь спасет мир"</p>
+    </header>
+    
+    <div class="space-y-12 relative z-10">
+        <div class="neo-card p-8 relative overflow-hidden bg-white">
+            <div class="absolute -right-6 -top-6 opacity-10">
+                <i data-lucide="gift" class="w-48 h-48 text-red-600"></i>
+            </div>
+            <h2 class="text-3xl font-black uppercase mb-6 text-red-600">История создания</h2>
+            <div class="space-y-4 text-lg font-medium text-gray-800 leading-relaxed">
+                <p>
+                    Однажды я захотел просто подарить радость. Без повода. Незнакомому человеку. Я искал место, где живут настоящие мечты.
+                </p>
+                <p>
+                    Но интернет встретил меня холодом: <span class="line-through text-gray-400">комиссии</span>, <span class="line-through text-gray-400">подписки</span>, <span class="line-through text-gray-400">фейки</span>. Магия исчезла под слоем алчности.
+                </p>
+                <p class="font-bold text-xl mt-6">
+                    И тогда я решил: <span class="bg-red-600 text-white px-2 py-1 rotate-1 inline-block border border-black">Я создам это сам.</span>
+                </p>
+                <p>
+                    Место, где каждый может стать волшебником. Место, где мечты сбываются по-настоящему.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="neo-card p-8 bg-black text-white transform rotate-[-1deg] hover:rotate-0 transition duration-300">
+                <div class="mb-4 text-yellow-400"><i data-lucide="ban" class="w-10 h-10"></i></div>
+                <h3 class="font-black text-2xl mb-2 text-yellow-400 uppercase">0% Комиссии</h3>
+                <p class="text-base text-gray-300">Мы не берем ни копейки за участие. Сервис живет на чистом энтузиазме и вере в добро.</p>
+            </div>
+            <div class="neo-card p-8 bg-red-600 text-white border-black transform rotate-[1deg] hover:rotate-0 transition duration-300">
+                <div class="mb-4 text-white"><i data-lucide="shield-check" class="w-10 h-10"></i></div>
+                <h3 class="font-black text-2xl mb-2 text-white uppercase">100% Честности</h3>
+                <p class="text-base text-red-100">Каждая мечта проходит ручную проверку. Мы бережем наше сообщество как зеницу ока.</p>
+            </div>
+        </div>
+
+        <div class="text-center py-16">
+            <h3 class="text-3xl font-black uppercase mb-8">Стань частью магии</h3>
+            <a href="/" class="inline-flex items-center gap-3 bg-black text-white px-10 py-5 font-black uppercase tracking-widest hover:scale-105 transition shadow-[6px_6px_0px_0px_#D42426] text-xl border-2 border-white">
+                <span>Загадать желание</span> <i data-lucide="sparkles" class="w-6 h-6 text-yellow-400"></i>
+            </a>
+        </div>
+    </div>
+    
+    <footer class="text-center mt-12 pb-8">
+        <p class="font-hand text-xl font-bold">Сделано с ❤️ и верой в тебя.</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

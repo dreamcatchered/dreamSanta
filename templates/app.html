@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Маркет Желаний 2025</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://api.dreampartners.online/icons/santa/android-chrome-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://api.dreampartners.online/icons/santa/android-chrome-512.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --red: #D42426;
+            --black: #1A1A1A;
+            --paper: #FDFBF7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--paper);
+            background-image: radial-gradient(#000000 1px, transparent 0);
+            background-size: 20px 20px;
+            background-position: -19px -19px;
+            overflow-x: hidden;
+        }
+
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .font-hand { font-family: 'Kalam', cursive; }
+
+        .neo-card {
+            background: white;
+            border: 3px solid var(--black);
+            box-shadow: 4px 4px 0px 0px var(--black);
+            transition: all 0.1s;
+        }
+        
+        .neo-btn {
+            border: 3px solid var(--black);
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            font-weight: 800;
+            box-shadow: 3px 3px 0px 0px var(--black);
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .neo-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px 0px var(--black); }
+
+        .pay-btn {
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .pay-btn.selected {
+            border-color: var(--black);
+            background-color: #f3f4f6;
+            box-shadow: 3px 3px 0px 0px var(--black);
+        }
+
+        .neo-input {
+            border: 3px solid var(--black);
+            background: #fff;
+            font-weight: 600;
+            outline: none;
+            border-radius: 8px;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeUp 0.3s ease-out; }
+        #screen-auth.active { display: flex; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-bg { background: rgba(0,0,0,0.7); backdrop-blur: 4px; }
+        
+        .role-btn.active {
+            background-color: var(--black);
+            color: white;
+            border-color: var(--black);
+        }
+        
+        /* Автоматический fill для лайкнутых сердечек */
+        .text-red-500 svg,
+        .text-red-500 svg path {
+            fill: currentColor !important;
+        }
+        .text-gray-400 svg,
+        .text-gray-400 svg path {
+            fill: none !important;
+        }
+        
+        /* Для Lucide иконок, которые могут быть прямыми SVG */
+        i.text-red-500 svg,
+        i.text-red-500 svg path {
+            fill: currentColor !important;
+        }
+        i.text-gray-400 svg,
+        i.text-gray-400 svg path {
+            fill: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- 1. AUTH SCREEN -->
+    <section id="screen-auth" class="screen active min-h-screen w-full items-center justify-center p-4">
+        <!-- Информационное сообщение о сохраненном намерении -->
+        <div id="auth-intent-notice" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 z-[60] max-w-md w-full mx-4">
+            <div class="neo-card p-4 bg-yellow-50 border-2 border-yellow-400 text-center">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <i data-lucide="heart" class="w-5 h-5 text-red-500"></i>
+                    <span class="font-black text-sm uppercase">Мечта ждет вас!</span>
+                </div>
+                <p class="text-xs text-gray-700">После входа откроется выбранная мечта</p>
+            </div>
+        </div>
+        <div class="max-w-md w-full relative">
+            <div class="neo-card p-8 relative z-10 w-full bg-white text-center">
+                <div class="inline-block border-3 border-black p-4 bg-red-600 text-white mb-6 rotate-3">
+                    <i data-lucide="gift" class="w-10 h-10"></i>
+                </div>
+                
+                <!-- TABS -->
+                <div class="flex border-b-2 border-black mb-6" id="authTabs">
+                    <button onclick="switchAuth('login')" id="btn-login" class="flex-1 pb-2 font-black uppercase text-sm border-b-4 border-black">Вход</button>
+                    <button onclick="switchAuth('register')" id="btn-register" class="flex-1 pb-2 font-black uppercase text-sm border-b-4 border-transparent text-gray-400">Регистрация</button>
+                    </div>
+
+                <!-- LOGIN FORM -->
+                <div id="form-login" class="space-y-4">
+                    <input type="text" id="loginUsername" name="username" autocomplete="username" placeholder="Логин" class="neo-input w-full p-4">
+                    <input type="password" id="loginPass" name="password" autocomplete="current-password" placeholder="Пароль" class="neo-input w-full p-4">
+                    <button onclick="doLogin()" class="neo-btn bg-black text-white w-full py-4 text-lg mt-2 hover:bg-gray-800 transition">Войти</button>
+                    </div>
+
+                <!-- REGISTER FLOW -->
+                <div id="form-register" class="space-y-4 hidden">
+                    <!-- Step 1: Data -->
+                    <div id="reg-step-1" class="space-y-4">
+                        <input type="text" id="regName" name="name" autocomplete="name" placeholder="Ваше имя" class="neo-input w-full p-4">
+                        <input type="text" id="regUsername" name="username" autocomplete="username" placeholder="Логин" class="neo-input w-full p-4">
+                        <input type="password" id="regPass" name="new-password" autocomplete="new-password" placeholder="Пароль" class="neo-input w-full p-4">
+                        <button onclick="startReg()" class="neo-btn bg-black text-white w-full py-4 text-lg mt-2 hover:bg-gray-800 transition">Далее</button>
+                    </div>
+
+                    <!-- Step 2: Phone -->
+                    <div id="reg-step-2" class="space-y-4 hidden">
+                        <p class="text-xs font-bold text-gray-500 uppercase mb-2">Подтверждение номера (РФ +7)</p>
+                        <p class="text-xs text-gray-600 mb-2">Сначала зарегистрируйтесь в боте <a href="https://t.me/dream_smsbot" target="_blank" class="text-blue-600 underline font-bold">@dream_smsbot</a> с этим номером</p>
+                        <input type="tel" id="regPhone" name="tel" autocomplete="tel" placeholder="+79990000000" class="neo-input w-full p-4 text-center tracking-widest" value="+7">
+                        <button onclick="sendRegCode()" class="neo-btn bg-black text-white w-full py-4 text-lg mt-2">Получить код</button>
+                        <button onclick="backToStep1()" class="text-xs font-bold text-gray-400 mt-2 uppercase">Назад</button>
+                    </div>
+
+                    <!-- Step 3: Code -->
+                    <div id="reg-step-3" class="space-y-4 hidden">
+                        <p class="text-xs font-bold text-gray-500 uppercase mb-2">Введите код из Telegram</p>
+                        <input type="text" id="regCode" name="one-time-code" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*" placeholder="######" class="neo-input w-full p-4 text-center tracking-[1em]" maxlength="6">
+                        <button onclick="finishReg()" class="neo-btn bg-red-600 text-white w-full py-4 text-lg mt-2">Подтвердить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HEADER -->
+    <header id="mainHeader" class="fixed top-0 inset-x-0 z-50 bg-white border-b-3 border-black h-16 hidden items-center px-4 justify-between">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('market')">
+            <div class="w-10 h-10 bg-black text-white flex items-center justify-center rotate-3 border-2 border-black p-1.5 shadow-[2px_2px_0px_0px_black]">
+                <img src="https://api.dreampartners.online/icons/santa/logo.svg" class="w-full h-full object-contain invert">
+            </div>
+            <div class="leading-none">
+                <h1 class="font-black uppercase text-sm font-display">Маркет</h1>
+                <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Желаний 2025</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Notifications Bell -->
+            <div class="relative cursor-pointer" onclick="toggleNotifications()">
+                <div class="w-9 h-9 border-2 border-black rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                </div>
+                <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black rounded-full w-5 h-5 flex items-center justify-center border-2 border-white hidden">0</span>
+            </div>
+            
+            <div class="bg-green-100 border-2 border-black px-3 py-1 rounded-full flex items-center gap-2 cursor-pointer hover:bg-green-200 transition" onclick="showTopUp()">
+                <span class="font-black text-sm" id="headerBalance">0 ₽</span>
+                <div class="bg-black text-white rounded-full w-4 h-4 flex items-center justify-center"><i data-lucide="plus" class="w-3 h-3"></i></div>
+            </div>
+            <div class="w-9 h-9 border-2 border-black rounded-full overflow-hidden cursor-pointer" onclick="navigate('profile')">
+                <img id="headerAvatar" src="" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </header>
+
+    <!-- MARKET -->
+    <section id="screen-market" class="screen pt-20 px-4 max-w-2xl mx-auto pb-24">
+        
+        <!-- BANNER -->
+        <div class="neo-card p-4 mb-6 bg-yellow-300 relative overflow-hidden group cursor-pointer" onclick="navigate('create')">
+            <div class="absolute -right-4 -bottom-4 opacity-20 group-hover:opacity-40 transition group-hover:scale-110 duration-500">
+                <i data-lucide="sparkles" class="w-32 h-32"></i>
+            </div>
+            <h2 class="text-2xl font-black uppercase font-display leading-none mb-1">Время чудес!</h2>
+            <p class="text-xs font-bold uppercase tracking-widest mb-3">Исполняй или загадывай</p>
+            <div class="inline-block bg-black text-white px-3 py-1 text-[10px] font-black uppercase">Начать сейчас →</div>
+        </div>
+
+        <!-- Categories with proper scroll -->
+        <div class="flex flex-wrap justify-center gap-2 pb-4 mb-4" id="catFilters">
+            <button class="cat-pill neo-btn bg-black text-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Все', this)">🔥 Все</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Гаджеты', this)">📱 Гаджеты</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Хобби', this)">🎨 Хобби</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Путешествия', this)">✈️ Путешествия</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Дом', this)">🏠 Дом</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Спорт', this)">⚽ Спорт</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Детям', this)">🧸 Детям</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Животные', this)">🐾 Животные</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Красота', this)">💄 Красота</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Одежда', this)">👗 Одежда</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Обучение', this)">🎓 Обучение</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Игры', this)">🎮 Игры</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Еда', this)">🍔 Еда</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Авто', this)">🚗 Авто</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Благотворительность', this)">❤️ Добро</button>
+            <button class="cat-pill neo-btn bg-white px-4 py-2 text-xs rounded-full whitespace-nowrap" onclick="filterCat('Разное', this)">✨ Разное</button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" id="feedContainer"></div>
+        
+        <button onclick="navigate('create')" class="fixed bottom-6 right-6 w-14 h-14 bg-red-600 border-3 border-black rounded-full text-white shadow-[4px_4px_0px_0px_black] flex items-center justify-center z-40 hover:scale-105 transition active:scale-95">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="screen-profile" class="screen pt-20 px-4 max-w-2xl mx-auto pb-24">
+        <div class="neo-card p-6 mb-8 relative overflow-hidden">
+            <!-- Edit Button Top Right -->
+            <div class="absolute top-4 right-4 z-20">
+                <button onclick="toggleEditProfile()" class="bg-white border-2 border-black p-2 rounded-full hover:bg-black hover:text-white transition shadow-sm" title="Настройки">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- VIEW MODE -->
+            <div id="profileView" class="relative z-10 flex flex-col items-center text-center">
+                <!-- Avatar -->
+                <div class="relative group mb-4 mx-auto flex items-center gap-3">
+                    <!-- Кнопка генерации (слева) -->
+                    <button onclick="generateAvatar()" class="cursor-pointer bg-white border-2 border-black p-2 rounded-full hover:bg-black hover:text-white transition shadow-sm" title="Сгенерировать аватарку">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <div class="relative group">
+                        <div class="w-28 h-28 border-3 border-black rounded-full overflow-hidden bg-white shadow-md relative mx-auto">
+                            <img id="profileAvatar" src="" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+                    <!-- Кнопка загрузки (справа) -->
+                    <label class="cursor-pointer bg-white border-2 border-black p-2 rounded-full hover:bg-black hover:text-white transition shadow-sm" title="Загрузить фото">
+                        <i data-lucide="camera" class="w-4 h-4"></i>
+                        <input type="file" class="hidden" accept="image/*" onchange="uploadAvatar(this)">
+                    </label>
+            </div>
+
+                <!-- Name & Username -->
+                <h3 class="text-2xl font-black uppercase mb-1 leading-none" id="profileName">...</h3>
+                <div onclick="copyProfileLink()" class="cursor-pointer group relative inline-block mb-2">
+                    <p class="text-gray-500 font-bold text-sm group-hover:text-red-600 transition">
+                        <span id="profileUsername">...</span> <i data-lucide="copy" class="w-3 h-3 inline ml-1 opacity-0 group-hover:opacity-100"></i>
+                    </p>
+            </div>
+                
+                <!-- Info Badges -->
+                <div class="flex gap-2 justify-center mb-6 text-[10px] font-bold uppercase text-gray-500">
+                    <span id="profilePhone">...</span>
+                    <span id="profileTelegram" class="text-blue-500 hidden"></span>
+        </div>
+
+                <!-- Bio -->
+                <div class="bg-yellow-50 border-2 border-black p-4 rounded-xl mb-6 w-full max-w-sm relative">
+                    <div class="absolute -top-3 left-4 bg-white border-2 border-black px-2 text-[10px] font-black uppercase">О себе</div>
+                    <p id="profileBio" class="text-sm font-medium italic text-gray-800">...</p>
+                </div>
+
+                <!-- Role Switcher -->
+                <div class="flex bg-gray-100 p-1 rounded-full border-2 border-black w-full max-w-xs mb-4">
+                    <button id="role-santa" onclick="switchRole('santa')" class="role-btn flex-1 py-2 rounded-full text-[10px] font-black uppercase transition-all">🎅 Я Санта</button>
+                    <button id="role-dreamer" onclick="switchRole('dreamer')" class="role-btn flex-1 py-2 rounded-full text-[10px] font-black uppercase transition-all">✨ Мечтатель</button>
+                </div>
+                
+                <button onclick="showWithdraw()" class="text-xs font-bold underline text-gray-400 hover:text-black decoration-2">Управление счетом</button>
+            </div>
+
+            <!-- EDIT MODE -->
+            <div id="profileEdit" class="hidden relative z-10">
+                <h3 class="font-black uppercase text-xl mb-4 text-center">Редактирование</h3>
+                
+                <div class="space-y-4 max-w-sm mx-auto">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase mb-1 ml-1">Имя</label>
+                        <input type="text" id="editName" class="neo-input w-full p-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase mb-1 ml-1">Логин (для ссылки)</label>
+                        <input type="text" id="editUsername" class="neo-input w-full p-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase mb-1 ml-1">Telegram (без @)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400 font-bold">@</span>
+                            <input type="text" id="editTelegram" class="neo-input w-full p-3 pl-8 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase mb-1 ml-1">Био</label>
+                        <textarea id="editBio" class="neo-input w-full p-3 text-sm" rows="3"></textarea>
+                    </div>
+                    
+                    <label class="flex items-center gap-3 cursor-pointer bg-gray-50 p-3 rounded-lg border-2 border-gray-200 hover:border-black transition">
+                        <input type="checkbox" id="editAnon" class="w-5 h-5 accent-black">
+                        <div>
+                            <div class="text-xs font-black uppercase">Анонимный Санта</div>
+                            <div class="text-[10px] text-gray-500 leading-tight">Скрывать мое имя, когда я дарю подарки</div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer bg-gray-50 p-3 rounded-lg border-2 border-gray-200 hover:border-black transition">
+                        <input type="checkbox" id="editPrivate" class="w-5 h-5 accent-black">
+                        <div>
+                            <div class="text-xs font-black uppercase">Анонимный профиль</div>
+                            <div class="text-[10px] text-gray-500 leading-tight">Не общедоступный (только я могу просматривать)</div>
+                        </div>
+                    </label>
+
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="saveProfile()" class="flex-1 bg-black text-white font-bold uppercase text-xs py-3 rounded hover:bg-gray-800">Сохранить</button>
+                        <button onclick="toggleEditProfile()" class="flex-1 bg-white border-2 border-gray-200 text-black font-bold uppercase text-xs py-3 rounded hover:bg-gray-50">Отмена</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 border-b-2 border-black mb-4 mt-6 items-center justify-between group/tabs">
+                <div class="flex gap-2">
+                    <button onclick="setTab('my')" id="tab-my" class="pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-black transition-all">Мои мечты</button>
+                    <button onclick="setTab('history')" id="tab-history" class="pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-transparent text-gray-400 transition-all">История</button>
+                </div>
+                <!-- Иконка глаза для показа/скрытия исполненных мечт (только для вкладки "Мои мечты") -->
+                <button id="toggleFulfilledBtn" onclick="toggleHideFulfilled()" class="opacity-0 group-hover/tabs:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded" title="Показать/скрыть исполненные мечты" style="display: none;">
+                    <i data-lucide="eye" id="eyeIcon" class="w-5 h-5 text-gray-600"></i>
+                </button>
+            </div>
+
+            <div id="profile-tab-content" class="space-y-3 min-h-[100px]"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-8">
+            <a href="/rules" class="bg-white border-2 border-black py-3 rounded-lg text-center text-xs font-black uppercase hover:bg-black hover:text-white transition shadow-[2px_2px_0px_0px_black] active:translate-y-1 active:shadow-none">Правила</a>
+            <a href="/about" class="bg-white border-2 border-black py-3 rounded-lg text-center text-xs font-black uppercase hover:bg-black hover:text-white transition shadow-[2px_2px_0px_0px_black] active:translate-y-1 active:shadow-none">О нас</a>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full text-center font-bold text-gray-400 uppercase text-[10px] hover:text-red-600 mb-8">Выйти</button>
+    </section>
+
+    <!-- CREATE DREAM -->
+    <section id="screen-create" class="screen pt-20 px-4 max-w-2xl mx-auto pb-24">
+        <button onclick="navigate('market')" class="mb-4 flex items-center gap-2 font-bold uppercase text-[10px]">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Назад
+        </button>
+        <h2 class="text-4xl font-black uppercase font-display mb-6">Новая мечта</h2>
+        <form onsubmit="submitNewDream(event)" class="space-y-4">
+            <div class="neo-card p-4 space-y-4">
+                <div>
+                    <label class="block font-black text-xs uppercase mb-2">Фото мечты</label>
+                    <label class="flex items-center gap-3 cursor-pointer border-2 border-dashed border-black p-4 rounded-lg hover:bg-gray-50 transition">
+                        <div class="bg-black text-white p-2 rounded"><i data-lucide="image-plus" class="w-5 h-5"></i></div>
+                        <span class="text-xs font-bold uppercase text-gray-500" id="fileName">Выбрать файл...</span>
+                        <input type="file" name="image" accept="image/*" class="hidden" onchange="document.getElementById('fileName').innerText = this.files[0]?.name || 'Выбрать файл...'">
+                    </label>
+                </div>
+                <input type="text" name="title" placeholder="Что ты хочешь?" class="neo-input w-full p-4" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" name="price" placeholder="Цена ₽" class="neo-input w-full p-4" required>
+                    <select name="category" class="neo-input w-full p-4 bg-white">
+                        <option value="Гаджеты">Гаджеты</option>
+                        <option value="Хобби">Хобби</option>
+                        <option value="Путешествия">Путешествия</option>
+                        <option value="Дом">Дом</option>
+                        <option value="Спорт">Спорт</option>
+                        <option value="Детям">Детям</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Красота">Красота</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Обучение">Обучение</option>
+                        <option value="Игры">Игры</option>
+                        <option value="Еда">Еда</option>
+                        <option value="Авто">Авто</option>
+                        <option value="Благотворительность">Благотворительность</option>
+                        <option value="Разное">Разное</option>
+                    </select>
+                </div>
+                <textarea name="desc" placeholder="Почему это важно?" class="neo-input w-full p-4 font-hand text-lg" rows="3"></textarea>
+            </div>
+            <button type="submit" class="neo-btn bg-red-600 text-white w-full py-5 text-xl">Опубликовать</button>
+        </form>
+    </section>
+
+    <!-- ONBOARDING MODAL -->
+    <div id="modal-onboarding" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 modal-bg"></div>
+        <div class="neo-card p-8 w-full max-w-sm relative z-10 bg-white text-center">
+            <div class="mb-4">
+                <i data-lucide="sparkles" class="w-12 h-12 mx-auto text-yellow-400"></i>
+            </div>
+            <h3 class="font-black uppercase text-2xl mb-2 font-display">Давай знакомиться!</h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed">Чтобы Санта узнал тебя лучше, расскажи немного о себе и оставь контакты.</p>
+            
+            <div class="space-y-4 mb-6 text-left">
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">О себе (твоя мечта)</label>
+                    <textarea id="ob-bio" class="neo-input w-full p-3 text-sm" rows="2" placeholder="Я верю в чудеса..."></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">Telegram (для связи)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400 font-bold">@</span>
+                        <input type="text" id="ob-telegram" class="neo-input w-full p-3 pl-8 text-sm" placeholder="username">
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="finishOnboarding()" class="neo-btn bg-black text-white w-full py-4 uppercase font-black hover:bg-gray-800">Готово!</button>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    
+                <!-- DETAIL -->
+    <div id="modal-detail" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 modal-bg" onclick="closeModal('modal-detail')"></div>
+        <div class="neo-card w-full max-w-lg relative z-10 overflow-hidden bg-white max-h-[90vh] overflow-y-auto">
+                        <button onclick="closeModal('modal-detail')" class="absolute top-4 right-4 z-20 bg-white border-2 border-black p-1 shadow-sm"><i data-lucide="x" class="w-6 h-6"></i></button>
+                        
+                        <div class="relative">
+            <img id="m-img" src="" class="w-full h-64 object-cover border-b-3 border-black">
+                            <div class="absolute top-4 left-4 flex flex-col gap-2">
+                                <span id="m-cat" class="text-[10px] font-black uppercase bg-white border-2 border-black px-3 py-1 shadow-sm"></span>
+                                <div id="m-verified-badge" class="hidden bg-blue-500 text-white border-2 border-black px-3 py-1 shadow-sm flex items-center gap-1">
+                                    <i data-lucide="check-circle" class="w-3 h-3"></i>
+                                    <span class="text-[10px] font-black uppercase">Проверено</span>
+                                </div>
+                            </div>
+                        </div>
+
+            <div class="p-6">
+                            <div class="flex justify-between items-start mb-6">
+                    <div>
+                                    <h3 id="m-title" class="text-3xl font-black uppercase font-display leading-tight mb-2"></h3>
+                                    <div class="flex items-center gap-4 text-gray-400">
+                                        <div class="flex items-center gap-1 text-xs font-bold">
+                                            <i data-lucide="eye" class="w-4 h-4"></i> <span id="m-views">0</span>
+                    </div>
+                                        <button onclick="handleLike(currentDream.id, this)" class="flex items-center gap-1 text-xs font-bold hover:text-red-500 transition cursor-pointer">
+                                            <i data-lucide="heart" id="m-like-icon" class="w-4 h-4 text-gray-400"></i> <span id="m-likes" class="text-gray-600">0</span>
+                </button>
+                </div>
+                                </div>
+                                <div id="m-price" class="text-3xl font-black text-red-600 font-display"></div>
+                            </div>
+
+                            <div id="m-author-block" class="flex items-center gap-3 mb-8 p-3 bg-gray-50 border-2 border-black rounded-xl cursor-pointer hover:bg-gray-100 transition group/author" onclick="if(currentDream && currentDream.authorUsername && !currentDream.hide_from_public) window.open('/@' + currentDream.authorUsername, '_blank')">
+                                <img id="m-author-avatar" src="" class="w-12 h-12 rounded-full border-2 border-black group-hover/author:scale-110 transition">
+                    <div>
+                                    <div class="text-[10px] font-black text-gray-400 uppercase leading-none mb-1">Мечтатель</div>
+                                    <div id="m-author-name" class="font-black text-lg leading-none mb-1"></div>
+                                    <div id="m-author-username" class="text-xs font-bold text-red-600 group-hover/author:text-red-700">@</div>
+                    </div>
+                </div>
+
+                            <div class="space-y-4 mb-8">
+                                <div>
+                                    <div class="text-[10px] font-black text-gray-400 uppercase mb-2">Почему это важно?</div>
+                                    <p id="m-desc" class="text-gray-700 font-medium leading-relaxed bg-paper p-4 border-2 border-dashed border-gray-200 rounded-lg italic"></p>
+                </div>
+                            </div>
+
+                            <div id="m-fulfilled-by" class="hidden mb-8 bg-yellow-50 p-4 border-2 border-black rounded-xl text-center">
+                                <span class="text-[10px] font-black uppercase text-gray-400 block mb-2">Волшебник исполнивший мечту</span>
+                                <div class="flex items-center justify-center gap-2">
+                                    <i data-lucide="sparkles" class="w-5 h-5 text-yellow-500"></i>
+                                    <span class="font-black text-xl" id="m-santa-name">Анонимный Санта</span>
+                                    <i data-lucide="sparkles" class="w-5 h-5 text-yellow-500"></i>
+                                </div>
+                            </div>
+                            
+                            <div id="buy-section" class="space-y-4">
+                                <button id="m-buy-btn" onclick="openConfirmBuy()" class="neo-btn bg-black text-white w-full py-5 text-xl gap-3 hover:bg-gray-900 group">
+                                    <span>Исполнить мечту</span>
+                                    <i data-lucide="gift" class="w-6 h-6 group-hover:rotate-12 transition"></i>
+                </button>
+                            </div>
+            </div>
+        </div>
+    </div>
+
+                <!-- CONFIRM BUY MODAL -->
+                <div id="modal-confirm-buy" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+                    <div class="absolute inset-0 modal-bg" onclick="closeModal('modal-confirm-buy')"></div>
+                    <div class="neo-card p-8 w-full max-w-sm relative z-10 bg-white text-center">
+                        <div class="inline-block border-3 border-black p-4 bg-yellow-400 text-black mb-6 rotate-3">
+                            <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="font-black uppercase text-2xl mb-2 font-display">Подтверждение</h3>
+                        <p class="text-sm text-gray-600 mb-6">Вы собираетесь списать <span id="confirm-price" class="font-black text-red-600 text-lg"></span> с вашего баланса для исполнения этой мечты.</p>
+                        
+                        <div class="space-y-4 mb-8">
+                            <label class="flex items-center gap-3 p-4 bg-gray-50 border-2 border-black rounded-xl cursor-pointer hover:bg-gray-100 transition text-left">
+                                <input type="checkbox" id="anon-check" class="w-6 h-6 border-3 border-black rounded bg-white">
+                                <span class="text-xs font-black uppercase leading-tight">Стать анонимным сантой</span>
+                            </label>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <button onclick="buyCurrentDream()" class="neo-btn bg-black text-white w-full py-4 uppercase font-black text-lg">Да, исполнить!</button>
+                            <button onclick="closeModal('modal-confirm-buy')" class="text-xs font-bold text-gray-400 uppercase hover:text-black transition">Отмена</button>
+                        </div>
+                    </div>
+                </div>
+
+    <!-- TOPUP / WITHDRAW -->
+    <div id="modal-money" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 modal-bg" onclick="closeModal('modal-money')"></div>
+        <div class="neo-card p-6 w-full max-w-sm relative z-10 bg-white">
+            <button onclick="closeModal('modal-money')" class="absolute top-4 right-4"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="font-black uppercase text-xl mb-6 font-display border-b-3 border-black pb-2" id="moneyTitle">Пополнение</h3>
+            
+            <!-- TOPUP FORM -->
+            <div id="form-topup" class="space-y-4">
+                <input type="number" id="topupVal" value="1000" class="neo-input w-full p-4 text-2xl font-black text-center">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="pay-btn p-3 flex flex-col items-center rounded-lg opacity-50 cursor-not-allowed border-2 border-gray-200" disabled>
+                        <i data-lucide="smartphone" class="mb-1"></i><span class="text-[10px] font-black">СБП</span>
+                    </button>
+                    <button class="pay-btn selected p-3 flex flex-col items-center rounded-lg border-2 border-black bg-gray-100 shadow-[2px_2px_0px_0px_black]">
+                        <i data-lucide="bitcoin" class="mb-1"></i><span class="text-[10px] font-black">CRYPTO</span>
+                    </button>
+                </div>
+
+                <button onclick="createPayment()" class="neo-btn bg-black text-white w-full py-4 uppercase font-black">Оплатить (USDT)</button>
+            </div>
+
+            <!-- WITHDRAW FORM -->
+            <div id="form-withdraw" class="space-y-4 hidden">
+                <p class="text-xs text-gray-500 font-medium">Доступно к выводу: <span id="avail-balance" class="font-bold text-black">0 ₽</span></p>
+                <div class="text-[9px] text-gray-400 leading-tight">Выводятся только подаренные средства. Депозиты выводу не подлежат (AML).</div>
+                <input type="number" id="w-amount" placeholder="Сумма" class="neo-input w-full p-4 font-bold">
+                <textarea id="w-details" placeholder="Номер карты / USDT TRC20" class="neo-input w-full p-4 text-sm" rows="2"></textarea>
+                <button onclick="requestWithdraw()" class="neo-btn bg-black text-white w-full py-4 uppercase font-black">Заказать вывод</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT WAITING MODAL -->
+    <div id="modal-payment-wait" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 modal-bg"></div>
+        <div class="neo-card p-8 w-full max-w-md relative z-10 bg-white text-center">
+            <button onclick="closePaymentWait()" class="absolute top-4 right-4 text-gray-400 hover:text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+            
+            <div class="mb-6">
+                <div class="relative w-20 h-20 mx-auto mb-4">
+                    <div class="absolute inset-0 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                    <i data-lucide="loader-2" class="w-12 h-12 mx-auto text-red-500 animate-spin absolute inset-0 flex items-center justify-center"></i>
+                </div>
+                <h3 class="font-black uppercase text-2xl mb-2 font-display">Ожидание оплаты</h3>
+                <p class="text-sm text-gray-600 mb-2">У вас есть <span id="payment-timer" class="font-black text-red-600">60:00</span> минут чтобы оплатить счет</p>
+                <p class="text-xs text-gray-400">Если передумали, просто закройте это окно</p>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg border-2 border-black mb-6">
+                <div class="text-xs text-gray-500 mb-2">Сумма:</div>
+                <div class="text-2xl font-black text-red-600 font-display" id="payment-amount">0 ₽</div>
+            </div>
+            
+            <a id="payment-link" href="#" target="_blank" class="neo-btn bg-black text-white w-full py-4 uppercase font-black mb-4 inline-block">
+                <i data-lucide="external-link" class="w-4 h-4 inline mr-2"></i> Перейти к оплате
+            </a>
+            
+            <button onclick="closePaymentWait()" class="text-xs font-bold text-gray-400 uppercase hover:text-black transition">Отменить</button>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS PANEL -->
+    <div id="notificationsPanel" class="fixed top-16 right-4 z-[150] w-80 max-w-[calc(100vw-2rem)] bg-white border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-lg hidden max-h-[70vh] overflow-hidden flex flex-col">
+        <div class="p-4 border-b-2 border-black flex justify-between items-center bg-yellow-50">
+            <h3 class="font-black uppercase text-sm">Уведомления</h3>
+            <button onclick="markAllNotificationsRead()" class="text-xs font-bold text-gray-600 hover:text-black">Прочитать все</button>
+        </div>
+        <div id="notificationsList" class="overflow-y-auto flex-1">
+            <div class="p-4 text-center text-gray-400 text-sm">Загрузка...</div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-20 inset-x-0 flex justify-center z-[200] pointer-events-none transition-all duration-300 -translate-y-40">
+        <div class="bg-black text-white border-2 border-white px-6 py-3 shadow-lg flex items-center gap-3">
+            <span class="font-bold text-xs uppercase" id="toastText">Готово</span>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let dreamsList = [];
+        let currentDream = null;
+        let activeTab = 'my';
+        let hideFulfilled = false; // Настройка скрытия исполненных мечт
+
+        // --- AUTH ---
+        function switchAuth(mode) {
+            if(mode === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('btn-login').classList.replace('border-transparent', 'border-black');
+                document.getElementById('btn-login').classList.remove('text-gray-400');
+                document.getElementById('btn-register').classList.replace('border-black', 'border-transparent');
+                document.getElementById('btn-register').classList.add('text-gray-400');
+            } else {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.remove('hidden');
+                document.getElementById('btn-register').classList.replace('border-transparent', 'border-black');
+                document.getElementById('btn-register').classList.remove('text-gray-400');
+                document.getElementById('btn-login').classList.replace('border-black', 'border-transparent');
+                document.getElementById('btn-login').classList.add('text-gray-400');
+            }
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPass').value;
+            
+            const res = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            const data = await res.json();
+            if(data.success) {
+                // Сохраняем намерение перед проверкой сессии
+                checkUrlParams();
+                checkSession();
+            } else {
+                showToast(data.message, true);
+            }
+        }
+
+        function startReg() {
+            const name = document.getElementById('regName').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const pass = document.getElementById('regPass').value;
+            
+            if(!name || !username || !pass) {
+                showToast("Заполните все поля", true);
+                return;
+            }
+            
+            // Валидация логина (только латиница, цифры, подчеркивание)
+            if(!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showToast("Логин может содержать только латинские буквы, цифры и подчеркивание", true);
+                return;
+            }
+            
+            if(username.length < 3) {
+                showToast("Логин должен быть не менее 3 символов", true);
+                return;
+            }
+            
+            if(pass.length < 6) {
+                showToast("Пароль должен быть не менее 6 символов", true);
+                return;
+            }
+            
+            document.getElementById('reg-step-1').classList.add('hidden');
+            document.getElementById('reg-step-2').classList.remove('hidden');
+        }
+
+        function backToStep1() {
+            document.getElementById('reg-step-2').classList.add('hidden');
+            document.getElementById('reg-step-1').classList.remove('hidden');
+        }
+
+        async function sendRegCode() {
+            const phone = document.getElementById('regPhone').value.trim();
+            
+            // Валидация номера
+            if(!phone || phone.length < 10) {
+                showToast("Введите корректный номер телефона", true);
+                return;
+            }
+            
+            if(!phone.startsWith('+7')) {
+                showToast("Только номера РФ (+7...)", true);
+                return;
+            }
+            
+            const res = await fetch('/auth/send-code', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({phone})
+            });
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById('reg-step-2').classList.add('hidden');
+                document.getElementById('reg-step-3').classList.remove('hidden');
+            } else {
+                // Показываем сообщение об ошибке (уже содержит информацию о боте, если нужно)
+                showToast(data.message, true);
+            }
+        }
+
+        async function finishReg() {
+            const name = document.getElementById('regName').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPass').value;
+            const phone = document.getElementById('regPhone').value;
+            const code = document.getElementById('regCode').value;
+
+            const res = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, username, password, phone, code})
+            });
+            const data = await res.json();
+            if(data.success) {
+                // Сохраняем намерение перед проверкой сессии
+                checkUrlParams();
+                checkSession(); // Auto login
+            } else showToast(data.message, true);
+        }
+
+        // Сохраняем намерение пользователя (какую мечту хочет исполнить)
+        function saveDreamIntent(dreamId) {
+            if(dreamId) {
+                sessionStorage.setItem('pendingDreamId', dreamId);
+            }
+        }
+
+        // Получаем сохраненное намерение и открываем мечту
+        function restoreDreamIntent() {
+            const savedDreamId = sessionStorage.getItem('pendingDreamId');
+            if(savedDreamId) {
+                sessionStorage.removeItem('pendingDreamId'); // Удаляем после использования
+                navigate('market');
+                // Ждем загрузки списка мечт перед открытием
+                setTimeout(() => {
+                    fetchDreams().then(() => {
+                        setTimeout(() => {
+                            openDetail(parseInt(savedDreamId));
+                            showToast("Открыта выбранная мечта! ✨", false);
+                        }, 300);
+                    });
+                }, 300);
+                return true;
+            }
+            return false;
+        }
+
+        // Проверяем URL параметр при загрузке
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dreamId = urlParams.get('dream');
+            if(dreamId) {
+                saveDreamIntent(dreamId);
+                // Очищаем URL от параметра
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // Показываем уведомление о сохраненном намерении
+        function showIntentNotice() {
+            const savedDreamId = sessionStorage.getItem('pendingDreamId');
+            if(savedDreamId) {
+                const notice = document.getElementById('auth-intent-notice');
+                if(notice) {
+                    notice.classList.remove('hidden');
+                    // Скрываем через 5 секунд
+                    setTimeout(() => {
+                        notice.classList.add('hidden');
+                    }, 5000);
+                }
+            }
+        }
+
+        async function checkSession() {
+            try {
+                // Сначала проверяем URL параметры
+                checkUrlParams();
+                
+                const res = await fetch('/auth/api/user/me');
+                if(res.ok) {
+                    const data = await res.json();
+                    if(data.id) {
+                        currentUser = data;
+                        initApp();
+                        return;
+                    }
+                }
+                document.getElementById('screen-auth').classList.add('active');
+                document.getElementById('mainHeader').classList.remove('flex');
+                document.getElementById('mainHeader').classList.add('hidden');
+                // Показываем уведомление если есть сохраненное намерение
+                setTimeout(() => {
+                    showIntentNotice();
+                    lucide.createIcons(); // Обновляем иконки
+                }, 100);
+            } catch(e) { console.error(e); }
+        }
+
+        function initApp() {
+            document.getElementById('screen-auth').classList.remove('active');
+            document.getElementById('mainHeader').classList.add('flex');
+            document.getElementById('mainHeader').classList.remove('hidden');
+            updateUI();
+            checkPendingPayment(); // Проверяем незавершенную транзакцию
+            loadNotifications(); // Загружаем уведомления
+            setInterval(loadNotifications, 30000); // Обновляем каждые 30 секунд
+            
+            // Сначала пытаемся восстановить намерение (сохраненная мечта из URL параметра)
+            const restored = restoreDreamIntent();
+            if(restored) {
+                return; // Мечта будет открыта в restoreDreamIntent
+            }
+            
+            // Проверяем hash для открытия мечты (для прямых ссылок типа /app#dream=123)
+            const hash = window.location.hash;
+            if(hash && hash.startsWith('#dream=')) {
+                const dreamId = hash.split('=')[1];
+            navigate('market');
+                fetchDreams().then(() => {
+                    setTimeout(() => openDetail(parseInt(dreamId)), 300);
+                });
+            } else {
+                navigate('market');
+            }
+        }
+
+        // --- NOTIFICATIONS ---
+        async function loadNotifications() {
+            if(!currentUser) return;
+            try {
+                const res = await fetch('/api/notifications');
+                const notifications = await res.json();
+                
+                // Обновляем счетчик
+                const unreadCount = notifications.filter(n => !n.is_read).length;
+                const badge = document.getElementById('notificationBadge');
+                if(unreadCount > 0) {
+                    badge.innerText = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+                
+                // Обновляем список если панель открыта
+                if(!document.getElementById('notificationsPanel').classList.contains('hidden')) {
+                    renderNotifications(notifications);
+                }
+            } catch(e) {
+                console.error('Error loading notifications:', e);
+            }
+        }
+
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notificationsList');
+            if(notifications.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Нет уведомлений</div>';
+                return;
+            }
+            
+            container.innerHTML = notifications.map(n => {
+                const bgColor = n.is_read ? 'bg-white' : 'bg-yellow-50';
+                const borderColor = n.is_read ? 'border-gray-200' : 'border-yellow-300';
+                return `
+                    <div class="p-4 border-b-2 ${borderColor} ${bgColor} cursor-pointer hover:bg-gray-50 transition" onclick="markNotificationRead(${n.id})">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0 mt-1">
+                                ${getNotificationIcon(n.type)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-black text-xs uppercase mb-1">${n.title}</div>
+                                <div class="text-xs text-gray-700 leading-relaxed">${n.message}</div>
+                                <div class="text-[9px] text-gray-400 mt-1">${n.time_ago}</div>
+                            </div>
+                            ${!n.is_read ? '<div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                'dream_moderated': '<i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>',
+                'dream_fulfilled': '<i data-lucide="gift" class="w-5 h-5 text-yellow-500"></i>',
+                'balance_topup': '<i data-lucide="wallet" class="w-5 h-5 text-green-600"></i>',
+                'withdrawal': '<i data-lucide="credit-card" class="w-5 h-5 text-blue-500"></i>'
+            };
+            return icons[type] || '<i data-lucide="bell" class="w-5 h-5 text-gray-400"></i>';
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationsPanel');
+            if(panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                loadNotifications().then(() => {
+                    fetch('/api/notifications')
+                        .then(r => r.json())
+                        .then(notifications => renderNotifications(notifications));
+                });
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        async function markNotificationRead(notifId) {
+            const res = await fetch(`/api/notifications/${notifId}/read`, {method: 'POST'});
+            if(res.ok) {
+                loadNotifications();
+                // Обновляем список
+                const res2 = await fetch('/api/notifications');
+                const notifications = await res2.json();
+                renderNotifications(notifications);
+            }
+        }
+
+        async function markAllNotificationsRead() {
+            const res = await fetch('/api/notifications/read-all', {method: 'POST'});
+            if(res.ok) {
+                loadNotifications();
+                // Обновляем список
+                const res2 = await fetch('/api/notifications');
+                const notifications = await res2.json();
+                renderNotifications(notifications);
+            }
+        }
+
+        // Закрытие панели при клике вне её
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notificationsPanel');
+            const bell = e.target.closest('[onclick="toggleNotifications()"]');
+            if(!panel.classList.contains('hidden') && !panel.contains(e.target) && !bell) {
+                panel.classList.add('hidden');
+            }
+        });
+
+        // --- GLOBAL UTILS ---
+        const formatMoney = (val) => {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: 'RUB',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(val);
+        };
+
+        window.toggleEditProfile = function() {
+            const view = document.getElementById('profileView');
+            const edit = document.getElementById('profileEdit');
+            if(view.classList.contains('hidden')) {
+                view.classList.remove('hidden');
+                edit.classList.add('hidden');
+            } else {
+                view.classList.add('hidden');
+                edit.classList.remove('hidden');
+            }
+        };
+
+        window.saveProfile = async function() {
+            const name = document.getElementById('editName').value;
+            const username = document.getElementById('editUsername').value;
+            const bio = document.getElementById('editBio').value;
+            const telegram = document.getElementById('editTelegram').value;
+            const is_anon = document.getElementById('editAnon').checked;
+            const is_private = document.getElementById('editPrivate').checked;
+            const hide_fulfilled_public = currentUser.hide_fulfilled_public || false;
+
+            const res = await fetch('/api/user/profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, username, bio, telegram, is_anon, is_private, hide_fulfilled_public})
+            });
+            const data = await res.json();
+            if(data.success) {
+                const me = await fetch('/auth/api/user/me');
+                currentUser = await me.json();
+                updateUI();
+                toggleEditProfile();
+                showToast("Профиль обновлен");
+            } else {
+                showToast(data.message || "Ошибка", true);
+            }
+        };
+
+        async function generateAvatar() {
+            const seeds = ["Santa", "Elf", "Deer", "Snowman", "Cookie", "Bear", "Cat", "Dog"];
+            const seed = seeds[Math.floor(Math.random() * seeds.length)] + Math.random().toString(36).substring(7);
+            
+            const res = await fetch('/api/user/avatar-gen', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({seed})
+            });
+            if(res.ok) {
+                currentUser.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+                updateUI();
+                showToast("Аватар обновлен!");
+            }
+        }
+
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if(!file) return;
+            
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            const res = await fetch('/api/user/avatar', {method: 'POST', body: formData});
+            const data = await res.json();
+            if(data.success) {
+                const me = await fetch('/auth/api/user/me');
+                currentUser = await me.json();
+                updateUI();
+                showToast("Аватар обновлен");
+            }
+        }
+
+        async function switchRole(role) {
+            const res = await fetch('/api/user/role', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({role})
+            });
+            if(res.ok) {
+                currentUser.role = role;
+                updateUI();
+                showToast("Роль изменена");
+            }
+        }
+
+        async function copyProfileLink() {
+            const url = window.location.origin + '/' + currentUser.username;
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast("Публичная ссылка скопирована! Хо-хо-хо!");
+            } catch(e) { showToast("Скопируйте: " + url); }
+        }
+
+        async function finishOnboarding() {
+            const bio = document.getElementById('ob-bio').value;
+            const telegram = document.getElementById('ob-telegram').value;
+            
+            if(!bio && !telegram) {
+                closeModal('modal-onboarding');
+                return;
+            }
+
+            const res = await fetch('/api/user/profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: currentUser.name,
+                    username: currentUser.username,
+                    is_anon: currentUser.is_anon,
+                    bio: bio || currentUser.bio,
+                    telegram: telegram || currentUser.telegram
+                })
+            });
+            
+            if(res.ok) {
+                closeModal('modal-onboarding');
+                const me = await fetch('/auth/api/user/me');
+                currentUser = await me.json();
+                updateUI();
+                showToast("Профиль заполнен! ✨");
+            }
+        }
+
+        function updateUI() {
+            if(!currentUser) return;
+            
+            // Onboarding check
+            if(!currentUser.bio && !currentUser.telegram) {
+                document.getElementById('modal-onboarding').classList.remove('hidden');
+                document.getElementById('modal-onboarding').classList.add('flex');
+            }
+
+            document.getElementById('headerBalance').innerText = formatMoney(currentUser.balance);
+            document.getElementById('headerAvatar').src = currentUser.avatar;
+            document.getElementById('profileName').innerText = currentUser.name;
+            document.getElementById('profileUsername').innerText = '@' + currentUser.username;
+            document.getElementById('profilePhone').innerText = currentUser.phone;
+            document.getElementById('profileAvatar').src = currentUser.avatar;
+            document.getElementById('profileBio').innerText = currentUser.bio || "Напиши пару слов о себе...";
+            
+            // Telegram
+            const tgEl = document.getElementById('profileTelegram');
+            if (currentUser.telegram) {
+                tgEl.innerText = '@' + currentUser.telegram.replace('@','');
+                tgEl.classList.remove('hidden');
+            } else {
+                tgEl.classList.add('hidden');
+            }
+
+            // Edit form values PRE-FILL
+            document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editUsername').value = currentUser.username;
+            document.getElementById('editBio').value = currentUser.bio || '';
+            document.getElementById('editTelegram').value = currentUser.telegram ? currentUser.telegram.replace('@','') : '';
+            document.getElementById('editAnon').checked = currentUser.is_anon || false;
+            document.getElementById('editPrivate').checked = currentUser.is_private || false;
+
+            // Roles
+            const isSanta = currentUser.role === 'santa';
+            const btnSanta = document.getElementById('role-santa');
+            const btnDreamer = document.getElementById('role-dreamer');
+            
+            if(isSanta) {
+                btnSanta.classList.add('active');
+                btnDreamer.classList.remove('active', 'bg-black', 'text-white');
+            } else {
+                btnDreamer.classList.add('active');
+                btnSanta.classList.remove('active', 'bg-black', 'text-white');
+            }
+            
+            lucide.createIcons();
+        }
+
+        // --- NAVIGATION ---
+        function navigate(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            document.getElementById('screen-' + screen).style.display = 'block';
+            window.scrollTo(0,0);
+            if(screen === 'market') fetchDreams();
+            if(screen === 'profile') setTab(activeTab);
+        }
+
+        // --- MARKET ---
+        async function fetchDreams(cat = 'Все') {
+            try {
+                const res = await fetch(`/api/dreams?category=${cat}`);
+                dreamsList = await res.json();
+                renderFeed();
+                return Promise.resolve();
+            } catch(e) {
+                console.error('Error fetching dreams:', e);
+                return Promise.reject(e);
+            }
+        }
+
+        function renderFeed() {
+            const cont = document.getElementById('feedContainer');
+            if(!dreamsList.length) {
+                cont.innerHTML = '<div class="col-span-2 text-center text-gray-400 font-bold py-10">Пусто...</div>';
+                return;
+            }
+            cont.innerHTML = dreamsList.map(d => `
+                <div class="neo-card overflow-hidden flex flex-col group h-full transition-transform hover:translate-y-[-4px]">
+                    <!-- Image & Badges -->
+                    <div class="h-48 overflow-hidden border-b-2 border-black bg-gray-100 relative cursor-pointer" onclick="openDetail(${d.id})">
+                        <img src="${d.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute top-2 left-2 flex flex-col gap-1">
+                            <span class="text-[9px] font-black bg-white/90 border border-black px-2 py-0.5 rounded shadow-sm uppercase">${d.category}</span>
+                            ${d.is_verified ? `
+                                <span class="text-[9px] font-black bg-blue-500 text-white border border-black px-2 py-0.5 rounded shadow-sm uppercase flex items-center gap-1 cursor-help" title="Подтверждено администрацией. Администрация гарантирует исполнение мечты.">
+                                    <i data-lucide="check-circle" class="w-2.5 h-2.5"></i> Проверено
+                                </span>
+                            ` : ''}
+                    </div>
+                        <div class="absolute bottom-2 right-2 bg-white/90 border border-black px-2 py-0.5 rounded text-[9px] font-black flex items-center gap-1">
+                            <i data-lucide="eye" class="w-2.5 h-2.5"></i> ${d.views}
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-4 flex flex-col flex-grow">
+                        <!-- Author (скрываем, если мечта скрыта из публичного профиля) -->
+                        ${d.hide_from_public ? `
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-5 h-5 rounded-full border border-black bg-gray-200 flex items-center justify-center">
+                                <i data-lucide="user-x" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400">Аноним</span>
+                        </div>
+                        ` : `
+                        <div class="flex items-center gap-2 mb-3 cursor-pointer group/author" onclick="window.open('/@${d.authorUsername}', '_blank')">
+                            <img src="${d.authorAvatar}" class="w-5 h-5 rounded-full border border-black shadow-sm group-hover/author:scale-110 transition">
+                            <span class="text-[10px] font-bold text-gray-600 group-hover/author:text-red-600 transition">@${d.authorUsername}</span>
+                        </div>
+                        `}
+
+                        <h3 class="font-black text-sm mb-4 line-clamp-2 uppercase leading-tight h-10 cursor-pointer" onclick="openDetail(${d.id})">${d.title}</h3>
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <div class="font-black text-red-600 text-lg leading-none font-display">${formatMoney(d.price)}</div>
+                            
+                            <div class="flex items-center gap-2">
+                                <button onclick="handleLike(${d.id}, this)" class="like-btn flex items-center gap-1 px-2 py-1 rounded-lg border-2 border-black hover:bg-red-50 transition active:scale-90 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                    <i data-lucide="heart" class="w-3.5 h-3.5 ${d.liked ? 'text-red-500' : 'text-gray-400'}" ${d.liked ? 'fill="currentColor"' : ''}></i>
+                                    <span class="text-[10px] font-black ${d.liked ? 'text-red-600' : 'text-gray-600'}">${d.likes}</span>
+                                </button>
+                                <button onclick="openDetail(${d.id})" class="neo-btn bg-black text-white px-3 py-1.5 text-[10px]">Исполнить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.handleLike = async function(id, btn) {
+            try {
+                // Находим элементы ДО запроса
+                const svg = btn.querySelector('svg[data-lucide="heart"]') || btn.querySelector('svg');
+                const span = btn.querySelector('span');
+                if(!svg || !span) {
+                    console.error('SVG or span not found in button');
+                    return;
+                }
+                
+                const res = await fetch(`/api/dreams/${id}/like`, { method: 'POST' });
+                const data = await res.json();
+                
+                if(data.success) {
+                    // Обновляем счетчик МГНОВЕННО
+                    span.innerText = data.likes;
+                    
+                    // Обновляем классы и fill МГНОВЕННО
+                    if(data.action === 'liked') {
+                        svg.classList.remove('text-gray-400');
+                        svg.classList.add('text-red-500');
+                        span.classList.remove('text-gray-600');
+                        span.classList.add('text-red-600');
+                        
+                        // Применяем fill сразу
+                        svg.setAttribute('fill', 'currentColor');
+                        svg.style.fill = 'currentColor';
+                        const paths = svg.querySelectorAll('path');
+                        paths.forEach(p => {
+                            p.setAttribute('fill', 'currentColor');
+                            p.style.fill = 'currentColor';
+                        });
+                        
+                        confetti({ particleCount: 40, spread: 50, origin: { x: 0.5, y: 0.8 }, colors: ['#ff0000', '#ff6666'] });
+                    } else {
+                        svg.classList.remove('text-red-500');
+                        svg.classList.add('text-gray-400');
+                        span.classList.remove('text-red-600');
+                        span.classList.add('text-gray-600');
+                        
+                        // Убираем fill сразу
+                        svg.removeAttribute('fill');
+                        svg.style.fill = 'none';
+                        const paths = svg.querySelectorAll('path');
+                        paths.forEach(p => {
+                            p.removeAttribute('fill');
+                            p.style.fill = 'none';
+                        });
+                    }
+                    
+                    // Обновляем состояние в dreamsList
+                    const dreamIndex = dreamsList.findIndex(d => d.id === id);
+                    if(dreamIndex !== -1) {
+                        dreamsList[dreamIndex].liked = data.action === 'liked';
+                        dreamsList[dreamIndex].likes = data.likes;
+                    }
+                    
+                    // Обновляем модальное окно если открыто
+                    if(currentDream && currentDream.id === id) {
+                        currentDream.liked = data.action === 'liked';
+                        currentDream.likes = data.likes;
+                        
+                        // В модальном окне ищем SVG по ID (Lucide заменяет <i> на <svg> с тем же ID)
+                        const modalIconElement = document.getElementById('m-like-icon');
+                        const modalLikesSpan = document.getElementById('m-likes');
+                        if(modalIconElement && modalLikesSpan) {
+                            // Ищем SVG - может быть сам элемент или внутри него
+                            const modalSvg = modalIconElement.tagName === 'SVG' ? modalIconElement : modalIconElement.querySelector('svg');
+                            
+                            modalLikesSpan.innerText = data.likes;
+                            
+                            if(data.action === 'liked') {
+                                if(modalSvg) {
+                                    modalSvg.classList.remove('text-gray-400');
+                                    modalSvg.classList.add('text-red-500');
+                                    modalSvg.setAttribute('fill', 'currentColor');
+                                    modalSvg.style.fill = 'currentColor';
+                                    const modalPaths = modalSvg.querySelectorAll('path');
+                                    modalPaths.forEach(p => {
+                                        p.setAttribute('fill', 'currentColor');
+                                        p.style.fill = 'currentColor';
+                                    });
+                                }
+                                modalLikesSpan.classList.remove('text-gray-600');
+                                modalLikesSpan.classList.add('text-red-600');
+                            } else {
+                                if(modalSvg) {
+                                    modalSvg.classList.remove('text-red-500');
+                                    modalSvg.classList.add('text-gray-400');
+                                    modalSvg.removeAttribute('fill');
+                                    modalSvg.style.fill = 'none';
+                                    const modalPaths = modalSvg.querySelectorAll('path');
+                                    modalPaths.forEach(p => {
+                                        p.removeAttribute('fill');
+                                        p.style.fill = 'none';
+                                    });
+                                }
+                                modalLikesSpan.classList.remove('text-red-600');
+                                modalLikesSpan.classList.add('text-gray-600');
+                            }
+                        }
+                    }
+                }
+            } catch(e) {
+                console.error('Error liking dream:', e);
+            }
+        };
+
+        window.toggleDreamPublic = async function(dreamId, btn, event) {
+            if(event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
+            if(!btn) {
+                console.error('Button element not found');
+                showToast("Ошибка: элемент кнопки не найден", true);
+                return;
+            }
+            
+            // Блокируем повторные клики
+            if(btn.disabled) {
+                console.log('Button already disabled, ignoring click');
+                return;
+            }
+            btn.disabled = true;
+            
+            console.log('Toggling dream visibility for dream ID:', dreamId);
+            
+            try {
+                const url = `/api/dreams/${dreamId}/toggle-public`;
+                console.log('Fetching URL:', url);
+                
+                const res = await fetch(url, { 
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                console.log('Response status:', res.status, res.statusText);
+                
+                if(!res.ok) {
+                    let errorData;
+                    try {
+                        errorData = await res.json();
+                        console.error('Error response:', errorData);
+                    } catch(e) {
+                        console.error('Failed to parse error response:', e);
+                        errorData = {message: 'Ошибка сервера'};
+                    }
+                    
+                    if(res.status === 403) {
+                        showToast("У вас нет прав для изменения этой мечты", true);
+                    } else if(res.status === 404) {
+                        showToast("Мечта не найдена", true);
+                    } else if(res.status === 401) {
+                        showToast("Необходима авторизация", true);
+                    } else {
+                        showToast(errorData.message || `Ошибка ${res.status}`, true);
+                    }
+                    btn.disabled = false;
+                    return;
+                }
+                
+                let data;
+                try {
+                    data = await res.json();
+                    console.log('Success response:', data);
+                } catch(e) {
+                    console.error('Failed to parse response:', e);
+                    showToast("Ошибка при чтении ответа сервера", true);
+                    btn.disabled = false;
+                    return;
+                }
+                
+                if(data.success) {
+                    showToast(data.hide_from_public ? "Мечта скрыта из публичного профиля" : "Мечта видна в публичном профиле");
+                    
+                    // Полностью перезагружаем список мечт для правильного отображения состояния
+                    if(activeTab === 'my') {
+                        console.log('Reloading dreams list after visibility toggle');
+                        await setTab('my');
+                    }
+                    
+                } else {
+                    console.error('Request failed:', data);
+                    showToast(data.message || "Ошибка", true);
+                }
+            } catch(e) {
+                console.error('Exception in toggleDreamPublic:', e);
+                console.error('Stack trace:', e.stack);
+                showToast("Ошибка при изменении видимости: " + (e.message || 'Неизвестная ошибка'), true);
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        function filterCat(cat, btn) {
+            document.querySelectorAll('.cat-pill').forEach(b => {
+                b.classList.replace('bg-black', 'bg-white');
+                b.classList.remove('text-white');
+            });
+            btn.classList.replace('bg-white', 'bg-black');
+            btn.classList.add('text-white');
+            fetchDreams(cat);
+        }
+
+        // --- DETAIL ---
+        async function openDetail(id) {
+            const res = await fetch(`/api/dreams/${id}`);
+            if(!res.ok) return;
+            currentDream = await res.json();
+
+            document.getElementById('m-img').src = currentDream.image;
+            document.getElementById('m-title').innerText = currentDream.title;
+            document.getElementById('m-cat').innerText = currentDream.category;
+            document.getElementById('m-price').innerText = formatMoney(currentDream.price);
+            document.getElementById('m-desc').innerText = currentDream.desc || 'Без описания';
+            
+            // Новые поля
+            document.getElementById('m-views').innerText = currentDream.views;
+            document.getElementById('m-likes').innerText = currentDream.likes;
+            
+            // Обновляем лайк в модальном окне
+            const likeIcon = document.getElementById('m-like-icon');
+            const likesSpan = document.getElementById('m-likes');
+            if(currentDream.liked) {
+                likeIcon.classList.remove('text-gray-400');
+                likeIcon.classList.add('text-red-500');
+                likesSpan.classList.remove('text-gray-600');
+                likesSpan.classList.add('text-red-600');
+            } else {
+                likeIcon.classList.remove('text-red-500');
+                likeIcon.classList.add('text-gray-400');
+                likesSpan.classList.remove('text-red-600');
+                likesSpan.classList.add('text-gray-600');
+            }
+            
+            // Проверяем, нужно ли скрывать автора (если мечта скрыта из публичного профиля)
+            const authorBlock = document.getElementById('m-author-block');
+            if(currentDream.hide_from_public) {
+                document.getElementById('m-author-name').innerText = 'Аноним';
+                document.getElementById('m-author-username').innerText = '';
+                document.getElementById('m-author-avatar').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0Ljc2MTQgMTIgMTcgOS43NjE0MiAxNyA3QzE3IDQuMjM4NTggMTQuNzYxNCAyIDEyIDJDOS4yMzg1OCAyIDcgNC4yMzg1OCA3IDdDNyA5Ljc2MTQyIDkuMjM4NTggMTIgMTIgMTJaIiBmaWxsPSIjOUZBMUExIi8+CjxwYXRoIGQ9Ik0xMiAxNEM5LjIzODU4IDE0IDQuNSAxNS43OSA0LjUgMTlWMjFIMTkuNVYxOUMxOS41IDE1Ljc5IDE0Ljc2MTQgMTQgMTIgMTRaIiBmaWxsPSIjOUZBMUExIi8+Cjwvc3ZnPg==';
+                if(authorBlock) {
+                    authorBlock.onclick = null;
+                    authorBlock.style.cursor = 'default';
+                    authorBlock.classList.remove('cursor-pointer', 'hover:bg-gray-100');
+                    authorBlock.style.opacity = '0.6';
+                }
+            } else {
+                document.getElementById('m-author-name').innerText = currentDream.author;
+                document.getElementById('m-author-username').innerText = '@' + currentDream.authorUsername;
+                document.getElementById('m-author-avatar').src = currentDream.authorAvatar;
+                if(authorBlock && currentDream.authorUsername) {
+                    authorBlock.onclick = () => window.open('/@' + currentDream.authorUsername, '_blank');
+                    authorBlock.style.cursor = 'pointer';
+                    authorBlock.classList.add('cursor-pointer', 'hover:bg-gray-100');
+                    authorBlock.style.opacity = '1';
+                }
+            }
+            
+            const verifyBadge = document.getElementById('m-verified-badge');
+            if(currentDream.is_verified) {
+                verifyBadge.classList.remove('hidden');
+                verifyBadge.classList.add('flex');
+                verifyBadge.title = "Подтверждено администрацией. Администрация гарантирует исполнение мечты.";
+            } else {
+                verifyBadge.classList.add('hidden');
+                verifyBadge.classList.remove('flex');
+            }
+            
+            const isMine = currentUser && currentDream.authorUsername === currentUser.username;
+            const buySection = document.getElementById('buy-section');
+            const fulfilledSection = document.getElementById('m-fulfilled-by');
+            
+            if(currentDream.status === 'fulfilled') {
+                buySection.classList.add('hidden');
+                fulfilledSection.classList.remove('hidden');
+                document.getElementById('m-santa-name').innerText = currentDream.fulfilled_by || "Аноним";
+            } else if(isMine) {
+                buySection.classList.add('hidden');
+                fulfilledSection.classList.add('hidden');
+            } else {
+                buySection.classList.remove('hidden');
+                fulfilledSection.classList.add('hidden');
+            }
+
+            document.getElementById('modal-detail').classList.remove('hidden');
+            document.getElementById('modal-detail').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        window.openConfirmBuy = function() {
+            if(!currentDream) return;
+            document.getElementById('confirm-price').innerText = formatMoney(currentDream.price);
+            document.getElementById('modal-confirm-buy').classList.remove('hidden');
+            document.getElementById('modal-confirm-buy').classList.add('flex');
+        };
+
+        window.buyCurrentDream = async function() {
+            const isAnon = document.getElementById('anon-check').checked;
+            
+            const res = await fetch(`/api/dreams/${currentDream.id}/buy`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({is_anonymous: isAnon})
+            });
+            const data = await res.json();
+            if(data.success) {
+                closeModal('modal-confirm-buy');
+                closeModal('modal-detail');
+                showToast("Мечта исполнена!");
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                const me = await fetch('/auth/api/user/me');
+                currentUser = await me.json();
+                updateUI();
+                fetchDreams();
+            } else {
+                showToast(data.message, true);
+                if(data.message.includes('средств')) {
+                    closeModal('modal-confirm-buy');
+                showTopUp();
+            }
+        }
+        };
+
+        // --- CREATE ---
+        async function submitNewDream(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const original = btn.innerText;
+            btn.innerText = 'Загрузка...';
+
+            const formData = new FormData(e.target);
+            try {
+                const res = await fetch('/api/dreams/create', {method: 'POST', body: formData});
+                const data = await res.json();
+                if(data.success) {
+                    showToast("Мечта создана!");
+                    e.target.reset();
+                    navigate('profile');
+                } else {
+                    showToast("Ошибка: " + data.message, true);
+                }
+            } catch(e) { showToast("Ошибка сети", true); }
+            finally { btn.innerText = original; }
+        }
+
+        // --- MONEY ---
+        function showTopUp() {
+            document.getElementById('moneyTitle').innerText = "Пополнение";
+            document.getElementById('form-topup').classList.remove('hidden');
+            document.getElementById('form-withdraw').classList.add('hidden');
+            document.getElementById('modal-money').classList.remove('hidden');
+            document.getElementById('modal-money').classList.add('flex');
+        }
+
+        function showWithdraw() {
+            document.getElementById('moneyTitle').innerText = "Вывод средств";
+            document.getElementById('form-topup').classList.add('hidden');
+            document.getElementById('form-withdraw').classList.remove('hidden');
+            document.getElementById('avail-balance').innerText = formatMoney(currentUser.earned);
+            document.getElementById('modal-money').classList.remove('hidden');
+            document.getElementById('modal-money').classList.add('flex');
+        }
+
+        let paymentTimer = null;
+        let paymentCheckInterval = null;
+
+        async function createPayment() {
+            const amount = document.getElementById('topupVal').value;
+            const res = await fetch('/pay/create', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({amount})
+            });
+            const data = await res.json();
+            if(data.success) {
+                closeModal('modal-money');
+                showPaymentWait(data.pay_url, amount, data.expires_at);
+            } else {
+                showToast(data.message || 'Ошибка создания платежа', true);
+            }
+        }
+
+        function showPaymentWait(payUrl, amount, expiresAt) {
+            document.getElementById('payment-link').href = payUrl;
+            document.getElementById('payment-amount').innerText = formatMoney(amount);
+            
+            // Открываем новое окно
+            window.open(payUrl, '_blank');
+            
+            // Показываем модалку
+            document.getElementById('modal-payment-wait').classList.remove('hidden');
+            document.getElementById('modal-payment-wait').classList.add('flex');
+            lucide.createIcons();
+            
+            // Таймер обратного отсчета
+            const expires = new Date(expiresAt);
+            updatePaymentTimer(expires);
+            
+            if(paymentTimer) clearInterval(paymentTimer);
+            paymentTimer = setInterval(() => updatePaymentTimer(expires), 1000);
+            
+            // Проверка оплаты каждые 5 секунд
+            if(paymentCheckInterval) clearInterval(paymentCheckInterval);
+            paymentCheckInterval = setInterval(async () => {
+                const res = await fetch('/pay/check', {method: 'POST'});
+                const data = await res.json();
+                if(data.success && data.balance > currentUser.balance) {
+                    currentUser.balance = data.balance;
+                    updateUI();
+                    closePaymentWait();
+                    showToast("Баланс пополнен! 🎉");
+                }
+            }, 5000);
+        }
+
+        function updatePaymentTimer(expires) {
+            const now = new Date();
+            const diff = Math.max(0, Math.floor((expires - now) / 1000));
+            
+            if(diff <= 0) {
+                closePaymentWait();
+                showToast("Время оплаты истекло", true);
+                return;
+            }
+            
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+            document.getElementById('payment-timer').innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function closePaymentWait() {
+            if(paymentTimer) {
+                clearInterval(paymentTimer);
+                paymentTimer = null;
+            }
+            if(paymentCheckInterval) {
+                clearInterval(paymentCheckInterval);
+                paymentCheckInterval = null;
+            }
+            document.getElementById('modal-payment-wait').classList.add('hidden');
+            document.getElementById('modal-payment-wait').classList.remove('flex');
+        }
+
+        // Проверка незавершенной транзакции при загрузке
+        async function checkPendingPayment() {
+            if(!currentUser) return;
+            const res = await fetch('/pay/pending');
+            const data = await res.json();
+            if(data.success && data.transaction) {
+                showPaymentWait(data.transaction.pay_url, data.transaction.amount, data.transaction.expires_at);
+            }
+        }
+
+        async function requestWithdraw() {
+            const amount = document.getElementById('w-amount').value;
+            const details = document.getElementById('w-details').value;
+            const res = await fetch('/pay/withdraw', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({amount, details})
+            });
+            const data = await res.json();
+            if(data.success) {
+                showToast("Заявка создана!");
+                closeModal('modal-money');
+                // update local state to reflect deduction
+                currentUser.balance -= amount;
+                currentUser.earned -= amount;
+                updateUI();
+            } else {
+                showToast(data.message, true);
+            }
+        }
+
+        // --- UTILS ---
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function showToast(msg, isErr=false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            t.classList.remove('-translate-y-40');
+            setTimeout(() => t.classList.add('-translate-y-40'), 3000);
+        }
+
+        async function setTab(tab) {
+            activeTab = tab;
+            // Показываем/скрываем иконку глаза только во вкладке "Мои мечты"
+            const toggleBtn = document.getElementById('toggleFulfilledBtn');
+            if(tab === 'my') {
+                toggleBtn.style.display = 'block';
+            } else {
+                toggleBtn.style.display = 'none';
+            }
+            const cont = document.getElementById('profile-tab-content');
+            cont.innerHTML = 'Загрузка...';
+            
+            document.getElementById('tab-my').className = tab==='my' ? "pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-black transition-all" : "pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-transparent text-gray-400 transition-all";
+            document.getElementById('tab-history').className = tab==='history' ? "pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-black transition-all" : "pb-2 px-2 font-black text-[10px] uppercase border-b-4 border-transparent text-gray-400 transition-all";
+
+            if(tab === 'my') {
+                const res = await fetch('/api/profile/dreams');
+                const list = await res.json();
+                
+                // Фильтруем исполненные мечты, если включена опция скрытия
+                const filteredList = hideFulfilled ? list.filter(d => d.status !== 'fulfilled') : list;
+                
+                if(filteredList.length === 0) {
+                    cont.innerHTML = '<div class="text-center text-gray-400 font-bold py-10 text-sm">' + 
+                        (hideFulfilled && list.length > 0 ? 'Все исполненные мечты скрыты' : 'У вас пока нет мечт') + 
+                        '</div>';
+                } else {
+                    cont.innerHTML = filteredList.map(d => {
+                        // Правильно определяем состояние скрытия (обрабатываем boolean и null/undefined)
+                        const isHidden = d.hide_from_public === true || d.hide_from_public === 1 || d.hide_from_public === 'true';
+                        
+                        return `
+                        <div class="border-2 border-black p-3 ${isHidden ? 'bg-gray-50 opacity-60' : 'bg-white hover:bg-gray-50'} flex items-center justify-between gap-3 group/item transition-all">
+                            <div class="flex-grow ${isHidden ? 'cursor-default opacity-70' : 'cursor-pointer'}" ${isHidden ? '' : `onclick="openDetail(${d.id})"`}>
+                                <div class="font-black text-xs uppercase mb-1 ${isHidden ? 'text-gray-500' : ''}">${d.title}</div>
+                                <div class="text-[10px] text-gray-400 mb-1">${formatMoney(d.price)}</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="status-tag text-[9px] font-bold px-2 py-0.5 rounded inline-block ${
+                                        d.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                        d.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                        d.status === 'fulfilled' ? 'bg-blue-100 text-blue-800' : 
+                                        'bg-red-100 text-red-800'
+                                    }">${d.status_ru || d.status}</div>
+                                    ${isHidden ? '<span class="text-[9px] font-bold text-blue-600 px-2 py-0.5 bg-blue-100 rounded">Скрыто</span>' : ''}
+                        </div>
+                    </div>
+                            <div class="flex items-center gap-2">
+                                <!-- Иконка глаза для скрытия из публичного профиля (для своих мечт ИЛИ исполненных) -->
+                                ${currentUser && (d.can_manage_visibility || d.user_id === currentUser.id || d.is_fulfilled_by_me) ? `
+                                <button onclick="toggleDreamPublic(${d.id}, this, event)" class="flex-shrink-0 ${isHidden ? 'text-blue-500' : 'text-gray-400'} hover:text-blue-600 p-2 hover:bg-blue-50 rounded transition" title="${isHidden ? 'Показать в публичном профиле' : 'Скрыть из публичного профиля'}">
+                                    <i data-lucide="${isHidden ? 'eye-off' : 'eye'}" class="w-4 h-4"></i>
+                                </button>
+                                ` : ''}
+                                ${d.status !== 'fulfilled' && d.is_owned ? `
+                                <button onclick="event.stopPropagation(); deleteDream(${d.id})" class="flex-shrink-0 text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition opacity-0 group-hover/item:opacity-100" title="Удалить мечту">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                                ` : ''}
+                    </div>
+                    </div>
+                    `;
+                    }).join('');
+                }
+                lucide.createIcons();
+            } else {
+                const res = await fetch('/api/profile/history');
+                const list = await res.json();
+                
+                // Фильтруем исполненные мечты из истории, если включена опция скрытия
+                const filteredList = hideFulfilled ? list.filter(h => {
+                    // Проверяем, не связана ли запись с исполненной мечтой
+                    if(h.related_id) {
+                        // Если это запись об исполнении мечты, скрываем её
+                        return !h.details.includes('Исполнена мечта') && !h.details.includes('исполнил мечту');
+                    }
+                    return true;
+                }) : list;
+                
+                if(filteredList.length === 0) {
+                    cont.innerHTML = '<div class="text-center text-gray-400 font-bold py-10 text-sm">История пуста</div>';
+                } else {
+                    cont.innerHTML = filteredList.map(h => `
+                        <div class="flex justify-between items-center border-b border-gray-100 py-3 cursor-pointer" onclick="${h.related_id ? `openDetail(${h.related_id})` : ''}">
+                        <div>
+                                <div class="font-bold text-[11px] leading-tight">${h.details}</div>
+                                <div class="text-[9px] text-gray-400 mt-1">${h.date}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        }
+
+        function toggleHideFulfilled() {
+            hideFulfilled = !hideFulfilled; // Переключаем состояние
+            const eyeIcon = document.getElementById('eyeIcon');
+            // Обновляем иконку: eye-off когда скрыто, eye когда показано
+            if(eyeIcon) {
+                eyeIcon.setAttribute('data-lucide', hideFulfilled ? 'eye-off' : 'eye');
+                lucide.createIcons();
+            }
+            // Обновляем отображение мечт
+            if(activeTab === 'my') {
+                setTab('my');
+            }
+        }
+
+        window.deleteDream = async function(id) {
+            if(!confirm('Вы уверены, что хотите удалить эту мечту?')) return;
+            
+            const res = await fetch(`/api/dreams/${id}/delete`, { method: 'POST' });
+            const data = await res.json();
+            if(data.success) {
+                showToast("Мечта удалена");
+                setTab('my'); // Reload dreams list
+            } else {
+                showToast(data.message || "Ошибка удаления", true);
+            }
+        };
+
+        function handleLogout() { fetch('/auth/logout').then(() => location.reload()); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            checkSession();
+        });
+    </script>
+</body>
+</html>

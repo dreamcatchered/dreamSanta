@@ -1,0 +1,21 @@
+{# 
+    SEO Includes - подключается в шаблонах для добавления SEO мета-тегов
+    Использование: {% include 'seo_includes.html' %}
+#}
+
+{# Переопределяемые блоки для SEO #}
+{% block seo_title %}{% endblock %}
+{% block seo_description %}{% endblock %}
+{% block seo_keywords %}{% endblock %}
+{% block seo_image %}{% endblock %}
+{% block seo_schema %}{% endblock %}
+
+{# JSON-LD Schema #}
+{% if seo_schema %}
+<script type="application/ld+json">
+{{ seo_schema|tojson|safe }}
+</script>
+{% endif %}
+
+
+

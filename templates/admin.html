@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ Санта</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://api.dreampartners.online/icons/santa/android-chrome-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://api.dreampartners.online/icons/santa/android-chrome-512.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f3f4f6; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border-2 border-black">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 p-1.5 border-2 border-black bg-white rounded-lg flex items-center justify-center">
+                <img src="https://api.dreampartners.online/icons/santa/logo.svg" class="w-full h-full object-contain">
+            </div>
+            <h1 class="text-2xl font-black uppercase font-display">Панель Санты</h1>
+        </div>
+        <div class="flex gap-4 text-sm font-bold">
+            <div class="bg-gray-100 px-3 py-1 rounded">💰 {{ "%.2f"|format(stats.system_balance)|replace(".", ",") }} ₽</div>
+            <div class="bg-gray-100 px-3 py-1 rounded">👥 {{ stats.users }}</div>
+            <a href="/" class="text-gray-500 hover:text-black flex items-center gap-1">Выход <i data-lucide="log-out" class="w-4 h-4"></i></a>
+        </div>
+    </header>
+
+    <!-- TABS -->
+    <div class="flex gap-2 mb-6 border-b-2 border-gray-200">
+        <button onclick="switchTab('moderation')" id="tab-moderation" class="px-6 py-3 font-bold uppercase text-sm border-b-2 border-black bg-white">Модерация</button>
+        <button onclick="switchTab('users')" id="tab-users" class="px-6 py-3 font-bold uppercase text-sm border-b-2 border-transparent hover:border-gray-300">Пользователи</button>
+        <button onclick="switchTab('dreams')" id="tab-dreams" class="px-6 py-3 font-bold uppercase text-sm border-b-2 border-transparent hover:border-gray-300">Мечты</button>
+    </div>
+
+    <!-- MODERATION TAB -->
+    <div id="section-moderation" class="tab-section">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- MODERATION FLOW -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-black relative overflow-hidden">
+            <h2 class="text-xl font-black uppercase mb-4 flex items-center gap-2"><i data-lucide="scan-eye"></i> Режим модерации</h2>
+            
+            <div id="mod-loading" class="text-center py-10 font-bold text-gray-400">Загрузка заявок...</div>
+            <div id="mod-empty" class="text-center py-10 font-bold text-green-600 hidden">Все заявки проверены! 🎉</div>
+            
+            <div id="mod-card" class="hidden">
+                <div class="flex gap-4 mb-4">
+                    <img id="mod-img" src="" class="w-32 h-32 object-cover rounded bg-gray-100 border border-gray-200">
+                    <div>
+                        <div class="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded inline-block mb-1" id="mod-cat"></div>
+                        <h3 class="font-bold text-lg leading-tight mb-1" id="mod-title"></h3>
+                        <div class="font-black text-red-600 text-xl mb-2" id="mod-price"></div>
+                        <div class="text-xs text-gray-500 font-medium">Автор: <span id="mod-author" class="text-black"></span></div>
+                        <div class="text-xs text-gray-500 font-medium">Тел: <span id="mod-phone" class="text-black"></span></div>
+                        <div class="text-xs text-gray-500 font-medium">TG: <span id="mod-tg" class="text-blue-500"></span></div>
+                    </div>
+                </div>
+                <p class="text-sm bg-gray-50 p-3 rounded mb-6 text-gray-700 italic" id="mod-desc"></p>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="doModerate('approve')" class="bg-green-500 text-white py-3 rounded font-bold uppercase text-sm hover:bg-green-600">Одобрить</button>
+                    <button onclick="doModerate('reject')" class="bg-red-500 text-white py-3 rounded font-bold uppercase text-sm hover:bg-red-600">Отклонить</button>
+                    <button onclick="doModerate('verify')" class="col-span-2 bg-blue-500 text-white py-3 rounded font-bold uppercase text-sm hover:bg-blue-600 flex items-center justify-center gap-2" id="verifyBtn">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> <span id="verifyBtnText">Подтвердить (Admin Verified)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- WITHDRAWALS -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-black uppercase">Выплаты ({{ withdrawals|length }})</h2>
+            {% for req in withdrawals %}
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="font-bold text-lg">{{ "%.2f"|format(req.amount)|replace(".", ",") }} ₽</div>
+                    <div class="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded uppercase">Ожидание</div>
+                </div>
+                <div class="bg-gray-50 p-2 rounded text-xs font-mono mb-4 break-all">{{ req.details }}</div>
+                <div class="flex gap-2">
+                    <a href="{{ url_for('admin.moderate_withdraw', id=req.id, action='approve') }}" class="flex-1 bg-black text-white py-2 rounded text-center text-xs font-bold uppercase hover:bg-gray-800">Подтвердить</a>
+                    <a href="{{ url_for('admin.moderate_withdraw', id=req.id, action='reject') }}" class="flex-1 border border-gray-300 py-2 rounded text-center text-xs font-bold uppercase hover:bg-gray-50">Отменить</a>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-gray-400 font-bold">Нет заявок на вывод</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ALL DREAMS BOARD -->
+    <div class="mt-12" id="dreams-board">
+        <h2 class="text-xl font-black uppercase mb-6">Все мечты (Доска)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for dream in all_dreams %}
+            <div class="bg-white p-4 rounded-xl shadow-sm border-2 border-gray-200 flex gap-4 {{ 'opacity-60' if dream.status == 'fulfilled' else '' }}">
+                <img src="{{ dream.image_url }}" class="w-16 h-16 object-cover rounded bg-gray-100 border border-gray-300">
+                <div class="flex-grow">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-bold text-sm mb-1 truncate flex-1">{{ dream.title }}</h3>
+                        <span class="text-[9px] uppercase font-bold border px-1 rounded h-fit ml-1
+                            {% if dream.status == 'approved' %}bg-green-100 text-green-800 border-green-300
+                            {% elif dream.status == 'pending' %}bg-yellow-100 text-yellow-800 border-yellow-300
+                            {% elif dream.status == 'rejected' %}bg-red-100 text-red-800 border-red-300
+                            {% elif dream.status == 'fulfilled' %}bg-blue-100 text-blue-800 border-blue-300
+                            {% endif %}">
+                            {% if dream.status == 'approved' %}Активно
+                            {% elif dream.status == 'pending' %}На модерации
+                            {% elif dream.status == 'rejected' %}Отклонено
+                            {% elif dream.status == 'fulfilled' %}Исполнено
+                            {% else %}{{ dream.status }}{% endif %}
+                        </span>
+                    </div>
+                    {% if dream.is_admin_verified %}
+                    <div class="text-[9px] text-blue-500 font-bold uppercase mb-1 flex items-center gap-1">
+                        <i data-lucide="check-circle" class="w-3 h-3"></i> Проверено
+                    </div>
+                    {% endif %}
+                    <div class="text-xs text-gray-700 mb-2 font-bold">{{ "%.2f"|format(dream.price)|replace(".", ",") }} ₽</div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal({{ dream.id }}, '{{ dream.title }}', {{ dream.price }}, '{{ dream.category }}', '{{ dream.description|replace("'", "\\'") }}', '{{ dream.image_url }}', {{ dream.is_admin_verified|lower }})" class="text-blue-500 text-[10px] font-bold uppercase hover:underline">Ред.</button>
+                        <a href="{{ url_for('admin.moderate', id=dream.id, action='delete') }}" class="text-red-500 text-[10px] font-bold uppercase hover:underline" onclick="return confirm('Удалить мечту?')">Удалить</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="section-users" class="tab-section hidden">
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-black mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <input type="text" id="userSearch" placeholder="Поиск (логин, имя, телефон, TG)" class="border-2 border-gray-200 rounded p-2 text-sm" onkeyup="searchUsers()">
+                <select id="userStatusFilter" class="border-2 border-gray-200 rounded p-2 text-sm bg-white" onchange="searchUsers()">
+                    <option value="">Все статусы</option>
+                    <option value="active">Активные</option>
+                    <option value="blocked">Заблокированные</option>
+                </select>
+                <select id="userRoleFilter" class="border-2 border-gray-200 rounded p-2 text-sm bg-white" onchange="searchUsers()">
+                    <option value="">Все роли</option>
+                    <option value="dreamer">Мечтатель</option>
+                    <option value="santa">Санта</option>
+                    <option value="admin">Админ</option>
+                </select>
+                <button onclick="searchUsers()" class="bg-black text-white font-bold uppercase py-2 rounded text-sm hover:bg-gray-800 flex items-center justify-center gap-2">
+                    <i data-lucide="search" class="w-4 h-4"></i> Поиск
+                </button>
+            </div>
+            <div id="usersList" class="space-y-3">
+                <div class="text-center py-10 text-gray-400">Загрузка пользователей...</div>
+            </div>
+            <div id="usersPagination" class="mt-6 flex justify-center gap-2"></div>
+        </div>
+    </div>
+
+    <!-- DREAMS TAB -->
+    <div id="section-dreams" class="tab-section hidden">
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-black">
+            <h2 class="text-xl font-black uppercase mb-6">Все мечты (Доска)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for dream in all_dreams %}
+                <div class="bg-white p-4 rounded-xl shadow-sm border-2 border-gray-200 flex gap-4 {{ 'opacity-60' if dream.status == 'fulfilled' else '' }}">
+                    <img src="{{ dream.image_url }}" class="w-16 h-16 object-cover rounded bg-gray-100 border border-gray-300">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-sm mb-1 truncate flex-1">{{ dream.title }}</h3>
+                            <span class="text-[9px] uppercase font-bold border px-1 rounded h-fit ml-1
+                                {% if dream.status == 'approved' %}bg-green-100 text-green-800 border-green-300
+                                {% elif dream.status == 'pending' %}bg-yellow-100 text-yellow-800 border-yellow-300
+                                {% elif dream.status == 'rejected' %}bg-red-100 text-red-800 border-red-300
+                                {% elif dream.status == 'fulfilled' %}bg-blue-100 text-blue-800 border-blue-300
+                                {% endif %}">
+                                {% if dream.status == 'approved' %}Активно
+                                {% elif dream.status == 'pending' %}На модерации
+                                {% elif dream.status == 'rejected' %}Отклонено
+                                {% elif dream.status == 'fulfilled' %}Исполнено
+                                {% else %}{{ dream.status }}{% endif %}
+                            </span>
+                        </div>
+                        {% if dream.is_admin_verified %}
+                        <div class="text-[9px] text-blue-500 font-bold uppercase mb-1 flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-3 h-3"></i> Проверено
+                        </div>
+                        {% endif %}
+                        <div class="text-xs text-gray-700 mb-2 font-bold">{{ "%.2f"|format(dream.price)|replace(".", ",") }} ₽</div>
+                        <div class="flex gap-2">
+                            <button onclick="openEditModal({{ dream.id }}, '{{ dream.title }}', {{ dream.price }}, '{{ dream.category }}', '{{ dream.description|replace("'", "\\'") }}', '{{ dream.image_url }}', {{ dream.is_admin_verified|lower }})" class="text-blue-500 text-[10px] font-bold uppercase hover:underline">Ред.</button>
+                            <a href="{{ url_for('admin.moderate', id=dream.id, action='delete') }}" class="text-red-500 text-[10px] font-bold uppercase hover:underline" onclick="return confirm('Удалить мечту?')">Удалить</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT DREAM MODAL -->
+    <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md m-4 max-h-[90vh] overflow-y-auto border-2 border-black">
+            <h3 class="text-xl font-black uppercase mb-4">Редактировать мечту</h3>
+            <form action="{{ url_for('admin.update_dream') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <input type="hidden" name="id" id="editId">
+                
+                <!-- Current Image Preview -->
+                <div id="editImagePreview" class="w-full h-48 border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-100 mb-4">
+                    <img id="editImageSrc" src="" class="w-full h-full object-cover">
+                </div>
+                
+                <input type="text" name="title" id="editTitle" class="w-full border-2 border-gray-200 rounded p-2 text-sm" placeholder="Название" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" name="price" id="editPrice" step="0.01" class="w-full border-2 border-gray-200 rounded p-2 text-sm" placeholder="Цена" required>
+                    <select name="category" id="editCategory" class="w-full border-2 border-gray-200 rounded p-2 text-sm bg-white">
+                        <option value="Гаджеты">Гаджеты</option>
+                        <option value="Хобби">Хобби</option>
+                        <option value="Путешествия">Путешествия</option>
+                        <option value="Дом">Дом</option>
+                        <option value="Спорт">Спорт</option>
+                        <option value="Детям">Детям</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Красота">Красота</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Обучение">Обучение</option>
+                        <option value="Игры">Игры</option>
+                        <option value="Еда">Еда</option>
+                        <option value="Авто">Авто</option>
+                        <option value="Благотворительность">Благотворительность</option>
+                        <option value="Разное">Разное</option>
+                    </select>
+                </div>
+                <textarea name="desc" id="editDesc" rows="3" class="w-full border-2 border-gray-200 rounded p-2 text-sm" placeholder="Описание"></textarea>
+                
+                <label class="flex items-center gap-2 cursor-pointer border-2 border-gray-200 rounded p-3 hover:bg-gray-50">
+                    <input type="checkbox" name="is_verified" id="editVerified" class="w-5 h-5">
+                    <span class="text-sm font-bold">Admin Verified (Проверено администрацией)</span>
+                </label>
+                
+                <div>
+                    <label class="block text-xs font-bold mb-2 uppercase">Изменить фото:</label>
+                    <input type="file" name="image" accept="image/*" class="text-xs w-full">
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-black text-white font-bold uppercase py-3 rounded text-sm hover:bg-gray-800">Сохранить</button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-100 text-black font-bold uppercase py-3 rounded text-sm hover:bg-gray-200">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div id="userEditModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-xl w-full max-w-2xl m-4 max-h-[90vh] overflow-y-auto border-2 border-black">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-black uppercase">Управление пользователем</h3>
+                <button onclick="closeUserModal()" class="text-gray-400 hover:text-black">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div id="userModalContent">
+                <div class="text-center py-10 text-gray-400">Загрузка...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentDreamId = null;
+
+        function loadNextDream() {
+            fetch('/admin/moderate/next')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('mod-loading').classList.add('hidden');
+                    if(data.empty) {
+                        document.getElementById('mod-card').classList.add('hidden');
+                        document.getElementById('mod-empty').classList.remove('hidden');
+                    } else {
+                        const d = data.dream;
+                        currentDreamId = d.id;
+                        document.getElementById('mod-img').src = d.image;
+                        document.getElementById('mod-title').innerText = d.title;
+                        document.getElementById('mod-cat').innerText = d.category;
+                        document.getElementById('mod-price').innerText = parseFloat(d.price).toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace('.', ',') + ' ₽';
+                        document.getElementById('mod-desc').innerText = d.desc;
+                        document.getElementById('mod-author').innerText = d.author;
+                        document.getElementById('mod-phone').innerText = data.author_phone;
+                        document.getElementById('mod-tg').innerText = data.author_telegram;
+                        
+                        // Update verify button based on current state
+                        const verifyBtn = document.getElementById('verifyBtn');
+                        const verifyBtnText = document.getElementById('verifyBtnText');
+                        if(d.is_verified) {
+                            verifyBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                            verifyBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                            verifyBtnText.innerText = '✓ Подтверждено (снять галочку)';
+                        } else {
+                            verifyBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                            verifyBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                            verifyBtnText.innerText = 'Подтвердить (Admin Verified)';
+                        }
+                        
+                        document.getElementById('mod-card').classList.remove('hidden');
+                        document.getElementById('mod-empty').classList.add('hidden');
+                        lucide.createIcons();
+                    }
+                });
+        }
+
+        function doModerate(action) {
+            if(!currentDreamId) return;
+            fetch(`/admin/dream/${currentDreamId}/${action}?ajax=1`)
+                .then(r => r.json())
+                .then(res => {
+                    if(res.success) {
+                        if(action === 'verify' && res.hasOwnProperty('is_verified')) {
+                            // Update button state immediately
+                            const verifyBtn = document.getElementById('verifyBtn');
+                            const verifyBtnText = document.getElementById('verifyBtnText');
+                            if(res.is_verified) {
+                                verifyBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                                verifyBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                                verifyBtnText.innerText = '✓ Подтверждено (снять галочку)';
+                            } else {
+                                verifyBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                                verifyBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                                verifyBtnText.innerText = 'Подтвердить (Admin Verified)';
+                            }
+                        } else {
+                            loadNextDream(); // Reload for other actions
+                        }
+                    }
+                });
+        }
+
+        function openEditModal(id, title, price, category, desc, imageUrl, isVerified) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editPrice').value = parseFloat(price).toFixed(2);
+            document.getElementById('editCategory').value = category;
+            document.getElementById('editDesc').value = desc || '';
+            document.getElementById('editImageSrc').src = imageUrl;
+            document.getElementById('editVerified').checked = isVerified === true || isVerified === 'true';
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
+        }
+
+        // Init
+        loadNextDream();
+
+        // ========== TAB SWITCHING ==========
+        function switchTab(tab) {
+            // Hide all sections
+            document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(b => {
+                b.classList.remove('border-black', 'bg-white');
+                b.classList.add('border-transparent');
+            });
+            
+            // Show selected tab
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('border-black', 'bg-white');
+            document.getElementById(`tab-${tab}`).classList.remove('border-transparent');
+            
+            if(tab === 'users') {
+                loadUsers();
+            }
+        }
+
+        // ========== USER MANAGEMENT ==========
+        let currentUsersPage = 1;
+        let currentUserSearch = '';
+        let currentUserStatus = '';
+        let currentUserRole = '';
+
+        function searchUsers() {
+            currentUserSearch = document.getElementById('userSearch').value;
+            currentUserStatus = document.getElementById('userStatusFilter').value;
+            currentUserRole = document.getElementById('userRoleFilter').value;
+            currentUsersPage = 1;
+            loadUsers();
+        }
+
+        function loadUsers(page = 1) {
+            currentUsersPage = page;
+            const params = new URLSearchParams({
+                page: page,
+                limit: 20
+            });
+            if(currentUserSearch) params.append('search', currentUserSearch);
+            if(currentUserStatus) params.append('status', currentUserStatus);
+            if(currentUserRole) params.append('role', currentUserRole);
+
+            fetch(`/admin/users?${params}`)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        renderUsers(data.users);
+                        renderUsersPagination(data.total, data.page, data.limit);
+                    }
+                });
+        }
+
+        function renderUsers(users) {
+            const container = document.getElementById('usersList');
+            if(users.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-400 font-bold">Пользователи не найдены</div>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="bg-gray-50 p-4 rounded-xl border-2 border-gray-200 hover:border-black transition">
+                    <div class="flex items-start gap-4">
+                        <div class="relative">
+                            <img src="${user.avatar_url}" class="w-16 h-16 rounded-lg border-2 border-gray-300 object-cover" id="avatar-${user.id}">
+                            <button onclick="deleteUserAvatar(${user.id})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" title="Удалить аватар">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <div class="font-bold text-lg">${user.name || 'Без имени'}</div>
+                                    <div class="text-sm text-gray-600">@${user.username}</div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        ${user.phone || 'Нет телефона'} | ${user.telegram || 'Нет TG'}
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span class="text-xs font-bold px-2 py-1 rounded ${user.status === 'blocked' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                                        ${user.status === 'blocked' ? 'Заблокирован' : 'Активен'}
+                                    </span>
+                                    <span class="text-xs font-bold px-2 py-1 rounded bg-blue-100 text-blue-800">
+                                        ${user.role === 'admin' ? 'Админ' : user.role === 'santa' ? 'Санта' : 'Мечтатель'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                                <div>Баланс: <span class="font-bold">${parseFloat(user.balance).toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₽</span></div>
+                                <div>Доступно: <span class="font-bold">${parseFloat(user.earned_balance).toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₽</span></div>
+                                <div>Мечты: <span class="font-bold">${user.dreams_count}</span></div>
+                                <div>${user.is_verified ? '✓ Верифицирован' : 'Не верифицирован'}</div>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="openUserModal(${user.id})" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold uppercase hover:bg-blue-600">
+                                    <i data-lucide="edit" class="w-3 h-3 inline"></i> Редактировать
+                                </button>
+                                <button onclick="viewUserDreams(${user.id})" class="bg-purple-500 text-white px-3 py-1 rounded text-xs font-bold uppercase hover:bg-purple-600">
+                                    <i data-lucide="heart" class="w-3 h-3 inline"></i> Мечты (${user.dreams_count})
+                                </button>
+                                ${user.status === 'blocked' 
+                                    ? `<button onclick="unblockUser(${user.id})" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold uppercase hover:bg-green-600">Разблокировать</button>`
+                                    : `<button onclick="blockUser(${user.id})" class="bg-yellow-500 text-white px-3 py-1 rounded text-xs font-bold uppercase hover:bg-yellow-600">Заблокировать</button>`
+                                }
+                                ${user.role !== 'admin' 
+                                    ? `<button onclick="deleteUser(${user.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold uppercase hover:bg-red-600">Удалить</button>`
+                                    : ''
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderUsersPagination(total, page, limit) {
+            const totalPages = Math.ceil(total / limit);
+            const container = document.getElementById('usersPagination');
+            
+            if(totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            for(let i = 1; i <= totalPages; i++) {
+                if(i === page) {
+                    html += `<button class="bg-black text-white px-4 py-2 rounded font-bold">${i}</button>`;
+                } else {
+                    html += `<button onclick="loadUsers(${i})" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded font-bold">${i}</button>`;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function openUserModal(userId) {
+            document.getElementById('userEditModal').classList.remove('hidden');
+            document.getElementById('userEditModal').classList.add('flex');
+            
+            fetch(`/admin/user/${userId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        renderUserEditForm(data.user, data.dreams);
+                    }
+                });
+        }
+
+        function renderUserEditForm(user, dreams) {
+            const container = document.getElementById('userModalContent');
+            container.innerHTML = `
+                <form id="userEditForm" onsubmit="saveUser(event, ${user.id})" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Логин</label>
+                            <input type="text" name="username" value="${user.username}" class="w-full border-2 border-gray-200 rounded p-2 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Имя</label>
+                            <input type="text" name="name" value="${user.name || ''}" class="w-full border-2 border-gray-200 rounded p-2 text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Телефон</label>
+                            <input type="text" name="phone" value="${user.phone || ''}" class="w-full border-2 border-gray-200 rounded p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Telegram</label>
+                            <input type="text" name="telegram" value="${user.telegram || ''}" class="w-full border-2 border-gray-200 rounded p-2 text-sm" placeholder="@username">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold mb-1 uppercase">О себе</label>
+                        <textarea name="bio" rows="2" class="w-full border-2 border-gray-200 rounded p-2 text-sm">${user.bio || ''}</textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Роль</label>
+                            <select name="role" class="w-full border-2 border-gray-200 rounded p-2 text-sm bg-white">
+                                <option value="dreamer" ${user.role === 'dreamer' ? 'selected' : ''}>Мечтатель</option>
+                                <option value="santa" ${user.role === 'santa' ? 'selected' : ''}>Санта</option>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Админ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Статус</label>
+                            <select name="status" class="w-full border-2 border-gray-200 rounded p-2 text-sm bg-white">
+                                <option value="active" ${user.status === 'active' ? 'selected' : ''}>Активен</option>
+                                <option value="blocked" ${user.status === 'blocked' ? 'selected' : ''}>Заблокирован</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Seed аватара</label>
+                            <input type="text" name="avatar_seed" value="${user.avatar_seed || 'Santa'}" class="w-full border-2 border-gray-200 rounded p-2 text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Баланс (₽)</label>
+                            <input type="number" name="balance" step="0.01" value="${user.balance}" class="w-full border-2 border-gray-200 rounded p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 uppercase">Доступно к выводу (₽)</label>
+                            <input type="number" name="earned_balance" step="0.01" value="${user.earned_balance}" class="w-full border-2 border-gray-200 rounded p-2 text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="border-2 border-gray-200 rounded p-4 space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_verified" ${user.is_verified ? 'checked' : ''} class="w-5 h-5">
+                            <span class="text-sm font-bold">Верифицирован</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_anon_pref" ${user.is_anon_pref ? 'checked' : ''} class="w-5 h-5">
+                            <span class="text-sm font-bold">Анонимность по умолчанию</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_private" ${user.is_private ? 'checked' : ''} class="w-5 h-5">
+                            <span class="text-sm font-bold">Приватный профиль</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="hide_fulfilled_public" ${user.hide_fulfilled_public ? 'checked' : ''} class="w-5 h-5">
+                            <span class="text-sm font-bold">Скрывать исполненные мечты</span>
+                        </label>
+                    </div>
+                    
+                    <div class="border-2 border-gray-200 rounded p-4">
+                        <label class="block text-xs font-bold mb-2 uppercase">Аватар</label>
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="${user.avatar_url}" class="w-20 h-20 rounded-lg border-2 border-gray-300 object-cover" id="userAvatarPreview">
+                            <div class="flex-1">
+                                <input type="file" name="avatar" accept="image/*" class="text-xs w-full mb-2" onchange="previewUserAvatar(event)">
+                                <button type="button" onclick="deleteUserAvatar(${user.id}, true)" class="text-red-500 text-xs font-bold uppercase hover:underline">Удалить аватар</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-2 border-red-200 rounded p-4 bg-red-50">
+                        <h4 class="font-bold mb-2 text-sm">Мечты пользователя (${dreams.length})</h4>
+                        <div class="max-h-40 overflow-y-auto space-y-2 mb-3">
+                            ${dreams.length === 0 
+                                ? '<div class="text-sm text-gray-500">Нет мечтаний</div>'
+                                : dreams.map(d => `
+                                    <div class="flex items-center justify-between bg-white p-2 rounded text-xs">
+                                        <span class="truncate flex-1">${d.title} - ${parseFloat(d.price).toLocaleString('ru-RU')} ₽</span>
+                                        <button type="button" onclick="deleteUserDream(${d.id}, ${user.id})" class="text-red-500 hover:underline ml-2">Удалить</button>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                        <button type="button" onclick="deleteAllUserDreams(${user.id})" class="bg-red-500 text-white px-4 py-2 rounded text-xs font-bold uppercase hover:bg-red-600">
+                            Удалить все мечты
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="flex-1 bg-black text-white font-bold uppercase py-3 rounded text-sm hover:bg-gray-800">
+                            Сохранить изменения
+                        </button>
+                        <button type="button" onclick="closeUserModal()" class="flex-1 bg-gray-100 text-black font-bold uppercase py-3 rounded text-sm hover:bg-gray-200">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            `;
+            lucide.createIcons();
+        }
+
+        function saveUser(event, userId) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Convert checkboxes
+            formData.append('is_verified', form.querySelector('[name="is_verified"]').checked);
+            formData.append('is_anon_pref', form.querySelector('[name="is_anon_pref"]').checked);
+            formData.append('is_private', form.querySelector('[name="is_private"]').checked);
+            formData.append('hide_fulfilled_public', form.querySelector('[name="hide_fulfilled_public"]').checked);
+            
+            fetch(`/admin/user/${userId}/update?ajax=1`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(r => {
+                if(r.ok) {
+                    return r.json();
+                } else {
+                    return r.json().then(err => Promise.reject(err));
+                }
+            })
+            .then(data => {
+                if(data.success) {
+                    alert('Пользователь обновлен!');
+                    closeUserModal();
+                    loadUsers(currentUsersPage);
+                } else {
+                    alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Ошибка при сохранении: ' + (err.message || 'Неизвестная ошибка'));
+            });
+        }
+
+        function previewUserAvatar(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('userAvatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function deleteUserAvatar(userId, inModal = false) {
+            if(!confirm('Удалить аватар пользователя?')) return;
+            
+            fetch(`/admin/user/${userId}/avatar/delete`, {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        if(inModal) {
+                            document.getElementById('userAvatarPreview').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=Santa`;
+                        } else {
+                            loadUsers(currentUsersPage);
+                        }
+                    }
+                });
+        }
+
+        function blockUser(userId) {
+            if(!confirm('Заблокировать пользователя?')) return;
+            fetch(`/admin/user/${userId}/block`, {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        loadUsers(currentUsersPage);
+                    }
+                });
+        }
+
+        function unblockUser(userId) {
+            fetch(`/admin/user/${userId}/unblock`, {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        loadUsers(currentUsersPage);
+                    }
+                });
+        }
+
+        function deleteUserDream(dreamId, userId) {
+            if(!confirm('Удалить эту мечту?')) return;
+            fetch(`/admin/user/${userId}/dream/${dreamId}/delete`, {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        openUserModal(userId); // Reload modal
+                    }
+                });
+        }
+
+        function deleteAllUserDreams(userId) {
+            if(!confirm('УДАЛИТЬ ВСЕ МЕЧТЫ ПОЛЬЗОВАТЕЛЯ? Это действие нельзя отменить!')) return;
+            fetch(`/admin/user/${userId}/dreams/delete-all`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({confirm: true})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.success) {
+                    alert(`Удалено мечтаний: ${data.deleted_count}`);
+                    openUserModal(userId); // Reload modal
+                }
+            });
+        }
+
+        function deleteUser(userId) {
+            if(!confirm('ПОЛНОСТЬЮ УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ И ВСЕ ЕГО ДАННЫЕ? Это действие нельзя отменить!')) return;
+            if(!confirm('Вы уверены? Это удалит пользователя, все его мечты, транзакции и другую информацию!')) return;
+            
+            fetch(`/admin/user/${userId}/delete`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({confirm: true})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Пользователь удален');
+                    loadUsers(currentUsersPage);
+                } else {
+                    alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            });
+        }
+
+        function viewUserDreams(userId) {
+            fetch(`/admin/user/${userId}/dreams`)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        const dreamsList = data.dreams.map(d => 
+                            `• ${d.title} - ${parseFloat(d.price).toLocaleString('ru-RU')} ₽ (${d.status_ru})`
+                        ).join('\\n');
+                        alert(`Мечты пользователя:\\n\\n${dreamsList || 'Нет мечтаний'}`);
+                    }
+                });
+        }
+
+        function closeUserModal() {
+            document.getElementById('userEditModal').classList.add('hidden');
+            document.getElementById('userEditModal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>

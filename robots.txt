@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /pay/
+
+# Sitemap
+Sitemap: https://dreamsanta.ru/sitemap.xml
+

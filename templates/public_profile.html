@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.name }} (@{{ user.username }}) - Маркет Желаний</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://api.dreampartners.online/icons/santa/android-chrome-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://api.dreampartners.online/icons/santa/android-chrome-512.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #FDFBF7; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .neo-card {
+            background: white;
+            border: 3px solid #1A1A1A;
+            box-shadow: 4px 4px 0px 0px #1A1A1A;
+        }
+        .tab-btn.active {
+            border-bottom: 4px solid black;
+            color: black;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-2xl mx-auto pb-20">
+    <a href="/" class="inline-block mb-8 font-bold uppercase text-xs border-b-2 border-black">← На главную</a>
+    
+    <div class="neo-card p-8 mb-10 text-center relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-10">
+            <i data-lucide="gift" class="w-32 h-32"></i>
+        </div>
+        <div class="relative z-10 flex flex-col items-center">
+            <img src="{{ user.avatar_url or 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.avatar_seed }}" class="w-32 h-32 border-3 border-black rounded-full bg-white mb-6 object-cover shadow-[4px_4px_0px_0px_black]">
+            
+            <h1 class="text-3xl font-black uppercase font-display mb-1 leading-none">{{ user.name }}</h1>
+            <p class="text-gray-500 font-bold mb-2">@{{ user.username }}</p>
+            {% if user.role %}
+            <div class="mb-4">
+                {% if user.role == 'santa' %}
+                <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-[10px] font-black uppercase border-2 border-red-800">🎅 Санта</span>
+                {% elif user.role == 'dreamer' %}
+                <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-[10px] font-black uppercase border-2 border-blue-800">✨ Мечтатель</span>
+                {% elif user.role == 'admin' %}
+                <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-[10px] font-black uppercase border-2 border-yellow-800">⭐ Администратор</span>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if user.telegram %}
+            <a href="https://t.me/{{ user.telegram|replace('@', '') }}" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-blue-500 hover:underline mb-4 bg-blue-50 px-2 py-1 rounded">
+                <i data-lucide="send" class="w-3 h-3"></i> Telegram
+            </a>
+            {% endif %}
+            
+            <p class="text-lg italic font-medium text-gray-800 max-w-sm mb-6">"{{ user.bio }}"</p>
+            
+            <div class="flex gap-4 text-xs font-black uppercase">
+                <div class="bg-gray-100 px-3 py-2 rounded border border-black">
+                    Мечты: {{ dreams|length }}
+                </div>
+                <div class="bg-yellow-100 px-3 py-2 rounded border border-black text-yellow-800">
+                    Исполнил: {{ fulfilled_gifts|length }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex border-b-2 border-gray-200 mb-6">
+        <button onclick="switchTab('wishes')" id="tab-wishes" class="tab-btn active flex-1 py-3 font-black uppercase text-xs text-gray-400 transition">Список желаний</button>
+        <button onclick="switchTab('gifts')" id="tab-gifts" class="tab-btn flex-1 py-3 font-black uppercase text-xs text-gray-400 transition">Подаренные чудеса</button>
+    </div>
+
+    <!-- WISHES -->
+    <div id="content-wishes" class="space-y-6">
+        {% for dream in dreams %}
+        {% if dream.status != 'rejected' %}
+        <a href="/app#dream={{ dream.id }}" class="block cursor-pointer">
+            <div class="neo-card p-4 flex gap-4 items-start hover:bg-gray-50 transition {{ 'opacity-60 bg-gray-50' if dream.status == 'fulfilled' else '' }}">
+                <div class="w-24 h-24 flex-shrink-0 border-2 border-black overflow-hidden bg-gray-100">
+                    <img src="{{ dream.image_url }}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[10px] font-black uppercase bg-gray-200 px-2 py-0.5 rounded">{{ dream.category }}</span>
+                        {% if dream.status == 'fulfilled' %}
+                        <span class="text-[10px] font-black uppercase bg-green-100 text-green-800 px-2 py-0.5 rounded border border-green-800">Исполнено</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="font-bold text-lg leading-tight mb-2">{{ dream.title }}</h3>
+                    <div class="font-black text-red-600 text-xl">{{ dream.price|format_rub }}</div>
+                </div>
+            </div>
+        </a>
+        {% endif %}
+        {% else %}
+        <p class="text-gray-400 font-bold text-center py-8">Пользователь пока не загадал желаний...</p>
+        {% endfor %}
+    </div>
+
+    <!-- GIFTS -->
+    <div id="content-gifts" class="space-y-6 hidden">
+        {% for gift in fulfilled_gifts %}
+        <a href="/app#dream={{ gift.id }}" class="block cursor-pointer">
+            <div class="neo-card p-4 flex gap-4 items-center bg-yellow-50 hover:bg-yellow-100 transition">
+                <div class="w-16 h-16 flex-shrink-0 border-2 border-black overflow-hidden bg-white rounded-full">
+                    <img src="{{ gift.image_url }}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-grow">
+                    <div class="text-[10px] font-black uppercase text-yellow-600 mb-1">Исполнил мечту</div>
+                    <h3 class="font-bold text-sm leading-tight">{{ gift.title }}</h3>
+                    <div class="text-xs text-gray-500 mt-1">для {{ gift.author.name }}</div>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p class="text-gray-400 font-bold text-center py-8">Пока нет исполненных желаний...</p>
+        {% endfor %}
+    </div>
+
+    <div class="mt-12 text-center">
+        <a href="/" class="inline-block bg-black text-white px-8 py-4 font-black uppercase tracking-widest hover:scale-105 transition">Стать Сантой</a>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-black', 'text-black'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            
+            document.getElementById('content-wishes').classList.add('hidden');
+            document.getElementById('content-gifts').classList.add('hidden');
+            document.getElementById('content-' + tab).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

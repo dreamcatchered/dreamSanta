@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    {# SEO Meta Tags #}
+    <title>{% block title %}Маркет Желаний 2025 - Исполняй мечты и дари чудеса{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Маркет Желаний 2025 - платформа, где можно загадать мечту и получить помощь в её исполнении. Твори чудеса и дари радость близким!{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}мечты, желания, подарки, чудеса, секретный санта, исполнение мечты, помощь, добро{% endblock %}">
+    <meta name="author" content="Dream Santa">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://dreamsanta.ru{% block canonical_path %}{{ request.path }}{% endblock %}">
+    
+    {# Open Graph / Facebook #}
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="https://dreamsanta.ru{% block og_path %}{{ request.path }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://api.dreampartners.online/icons/santa/og-image.png{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{% block og_image_alt %}Маркет Желаний 2025{% endblock %}">
+    <meta property="og:site_name" content="Dream Santa - Маркет Желаний">
+    <meta property="og:locale" content="ru_RU">
+    
+    {# Twitter Card #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dreamsanta.ru{% block twitter_path %}{{ request.path }}{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}https://api.dreampartners.online/icons/santa/og-image.png{% endblock %}">
+    <meta name="twitter:image:alt" content="{% block twitter_image_alt %}Маркет Желаний 2025{% endblock %}">
+    
+    {# Favicons #}
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="manifest" href="https://api.dreampartners.online/icons/santa/site.webmanifest">
+    <link rel="mask-icon" href="https://api.dreampartners.online/icons/santa/safari-pinned-tab.svg" color="#ef4444">
+    <meta name="msapplication-TileColor" content="#ef4444">
+    <meta name="theme-color" content="#ffffff">
+    
+    {# Additional SEO #}
+    <meta name="format-detection" content="telephone=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dream Santa">
+    
+    {# Structured Data (JSON-LD) #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "{% block schema_type %}WebSite{% endblock %}",
+        "name": "Dream Santa - Маркет Желаний",
+        "url": "https://dreamsanta.ru",
+        "description": "Платформа для исполнения мечтаний. Загадай мечту или помоги исполнить чужую.",
+        "logo": "https://api.dreampartners.online/icons/santa/logo.svg",
+        "sameAs": [
+            {% block social_links %}{% endblock %}
+        ],
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://dreamsanta.ru/app?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+        {% block schema_extra %}{% endblock %}
+    }
+    </script>
+    
+    {# Styles and Scripts #}
+    {% block head_styles %}{% endblock %}
+    {% block head_scripts %}{% endblock %}
+    
+    {# Analytics placeholder #}
+    {% block analytics %}{% endblock %}
+</head>
+<body>
+    {# Main Content #}
+    {% block body %}{% endblock %}
+    
+    {# Footer Scripts #}
+    {% block footer_scripts %}{% endblock %}
+</body>
+</html>
+
+
+

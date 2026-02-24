@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Как это работает? - Маркет Желаний</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="https://api.dreampartners.online/icons/santa/favicon.ico">
+    <link rel="apple-touch-icon" href="https://api.dreampartners.online/icons/santa/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://api.dreampartners.online/icons/santa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://api.dreampartners.online/icons/santa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://api.dreampartners.online/icons/santa/android-chrome-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://api.dreampartners.online/icons/santa/android-chrome-512.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #FDFBF7; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .neo-card {
+            background: white;
+            border: 3px solid #1A1A1A;
+            box-shadow: 4px 4px 0px 0px #1A1A1A;
+        }
+        .step-num {
+            width: 40px; height: 40px;
+            background: #D42426; color: white;
+            border: 2px solid black;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-family: 'Montserrat', sans-serif;
+            margin-bottom: 1rem;
+            box-shadow: 2px 2px 0px 0px black;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+    <a href="/" class="inline-block mb-8 font-bold uppercase text-xs border-b-2 border-black hover:text-red-600">← На главную</a>
+    
+    <header class="text-center mb-16">
+        <h1 class="text-4xl md:text-6xl font-black uppercase font-display mb-4">Правила чудес</h1>
+        <p class="text-xl font-medium text-gray-600 max-w-xl mx-auto">Простой гид о том, как безопасно дарить и получать подарки в нашем сообществе.</p>
+    </header>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <!-- Giving -->
+        <div class="neo-card p-8">
+            <h2 class="text-2xl font-black uppercase mb-6 flex items-center gap-2">
+                <i data-lucide="gift" class="text-red-600"></i> Я хочу подарить
+            </h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="step-num">1</div>
+                    <h3 class="font-bold text-lg mb-1">Выбери мечту</h3>
+                    <p class="text-sm text-gray-600">Листай ленту желаний. Найди то, что откликается в твоем сердце. Это может быть что угодно: от книги до путешествия.</p>
+                </div>
+                <div>
+                    <div class="step-num">2</div>
+                    <h3 class="font-bold text-lg mb-1">Оплати безопасно</h3>
+                    <p class="text-sm text-gray-600">Мы используем безопасные платежи (Crypto/USDT). Твои средства замораживаются и переводятся мечтателю только для исполнения конкретной цели.</p>
+                </div>
+                <div>
+                    <div class="step-num">3</div>
+                    <h3 class="font-bold text-lg mb-1">Стань тайным (по желанию)</h3>
+                    <p class="text-sm text-gray-600">Ты можешь остаться анонимным героем. Просто поставь галочку при оплате или в настройках профиля.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receiving -->
+        <div class="neo-card p-8 bg-black text-white">
+            <h2 class="text-2xl font-black uppercase mb-6 flex items-center gap-2">
+                <i data-lucide="star" class="text-yellow-400"></i> Я хочу получить
+            </h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="step-num border-white text-black bg-white shadow-none">1</div>
+                    <h3 class="font-bold text-lg mb-1">Создай мечту</h3>
+                    <p class="text-sm text-gray-400">Опиши свою мечту искренне. Добавь красивое фото. Расскажи, почему это важно для тебя.</p>
+                </div>
+                <div>
+                    <div class="step-num border-white text-black bg-white shadow-none">2</div>
+                    <h3 class="font-bold text-lg mb-1">Пройди модерацию</h3>
+                    <p class="text-sm text-gray-400">Мы проверяем все заявки вручную. Не допускаются: фейки, политика, 18+, попрошайничество без цели. Будь честным!</p>
+                </div>
+                <div>
+                    <div class="step-num border-white text-black bg-white shadow-none">3</div>
+                    <h3 class="font-bold text-lg mb-1">Получи средства</h3>
+                    <p class="text-sm text-gray-400">Когда Санта исполнит мечту, средства появятся на твоем балансе в разделе "Подаренные". Ты сможешь вывести их на карту или кошелек.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="neo-card p-8 mb-16 bg-yellow-50">
+        <h2 class="text-2xl font-black uppercase mb-4 text-center">🛡️ Безопасность и AML</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+                <div class="bg-white border-2 border-black p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-bold mb-2">Верификация</h3>
+                <p class="text-xs text-gray-600">Все пользователи подтверждают реальный номер телефона РФ. Никаких ботов.</p>
+            </div>
+            <div>
+                <div class="bg-white border-2 border-black p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-bold mb-2">Защита средств</h3>
+                <p class="text-xs text-gray-600">Пополненные (депозитные) средства нельзя вывести обратно. Это защита от отмывания денег.</p>
+            </div>
+            <div>
+                <div class="bg-white border-2 border-black p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="eye" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-bold mb-2">Прозрачность</h3>
+                <p class="text-xs text-gray-600">Администрация видит все операции. Подозрительные транзакции блокируются до выяснения.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="text-center text-gray-400 text-xs font-bold uppercase pb-8">
+        © 2025 Маркет Желаний. Сделано с любовью к чудесам.
+    </footer>
+    
+    <script>lucide.createIcons();</script>
+</body>
+</html>
